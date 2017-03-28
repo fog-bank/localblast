@@ -9,323 +9,338 @@ using System.Xml.Linq;
 
 namespace LocalBlast
 {
-	public class BlastpPage : TabPage
-	{
-		private string path;
-		private string dbPath;
-		private string query;
-		private string jobTitle;
-		private string jobId = Guid.NewGuid().ToString();
-		private bool cleanup = true;
+    public class BlastpPage : TabPage
+    {
+        private string path;
+        private string dbPath;
+        private string query;
+        private string jobTitle;
+        private string jobId = Guid.NewGuid().ToString();
+        private bool cleanup = true;
 
-		private bool running;
-		private CancellationTokenSource cts;
+        private bool running;
+        private CancellationTokenSource cts;
 
-		private int queryLength;
-		private List<Hit> hits = new List<Hit>();
-		private Hit selectedHit;
-		private SegmentPair selectedSegment;
+        private int queryLength;
+        private string message;
+        private List<Hit> hits = new List<Hit>();
+        private Hit selectedHit;
+        private SegmentPair selectedSegment;
 
-		public BlastpPage(MainViewModel owner)
-			: base(owner)
-		{
-			Header = "blastp";
-			State = PageState.New;
+        public BlastpPage(MainViewModel owner)
+            : base(owner)
+        {
+            Header = "blastp";
+            State = PageState.New;
 
-			RunCommand = new DelegateCommand(Run, CanRun);
-			CancelCommand = new DelegateCommand(Cancel, CanCancel);
-			CloseCommand = new DelegateCommand(Close);
-		}
+            RunCommand = new DelegateCommand(Run, CanRun);
+            CancelCommand = new DelegateCommand(Cancel, CanCancel);
+            CloseCommand = new DelegateCommand(Close);
+        }
 
-		public DelegateCommand RunCommand { get; }
-		public DelegateCommand CancelCommand { get; }
-		public override DelegateCommand CloseCommand { get; }
+        public DelegateCommand RunCommand { get; }
+        public DelegateCommand CancelCommand { get; }
+        public override DelegateCommand CloseCommand { get; }
 
-		public string BlastpPath
-		{
-			get { return path; }
-			set
-			{
-				path = value;
-				OnPropertyChanged();
-			}
-		}
+        public string BlastpPath
+        {
+            get { return path; }
+            set
+            {
+                path = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public string BlastpDbPath
-		{
-			get { return dbPath; }
-			set
-			{
-				dbPath = value;
-				OnPropertyChanged();
-			}
-		}
+        public string BlastpDbPath
+        {
+            get { return dbPath; }
+            set
+            {
+                dbPath = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public string Query
-		{
-			get { return query; }
-			set
-			{
-				if (value != null && value.StartsWith(">"))
-				{
-					int index = value.IndexOf('\n');
+        public string Query
+        {
+            get { return query; }
+            set
+            {
+                if (value != null && value.StartsWith(">"))
+                {
+                    int index = value.IndexOf('\n');
 
-					if (index >= 2)
-					{
-						JobTitle = value.Substring(1, index).Trim();
-						value = value.Substring(index + 1);
-					}
-				}
-				query = value;
-				OnPropertyChanged();
-				RunCommand.OnCanExecuteChanged();
-			}
-		}
+                    if (index >= 2)
+                    {
+                        JobTitle = value.Substring(1, index).Trim();
+                        value = value.Substring(index + 1);
+                    }
+                }
+                query = value;
+                OnPropertyChanged();
+                RunCommand.OnCanExecuteChanged();
+            }
+        }
 
-		public string JobTitle
-		{
-			get { return jobTitle; }
-			set
-			{
-				jobTitle = value;
-				OnPropertyChanged();
+        public string JobTitle
+        {
+            get { return jobTitle; }
+            set
+            {
+                jobTitle = value;
+                OnPropertyChanged();
 
-				Header = JobTitle;
-			}
-		}
+                Header = JobTitle;
+            }
+        }
 
-		public string JobID
-		{
-			get { return jobId; }
-			set
-			{
-				jobId = value;
-				OnPropertyChanged();
-			}
-		}
+        public string JobID
+        {
+            get { return jobId; }
+            set
+            {
+                jobId = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public bool EnableCleanup
-		{
-			get { return cleanup; }
-			set
-			{
-				cleanup = value;
-				OnPropertyChanged();
-			}
-		}
+        public bool EnableCleanup
+        {
+            get { return cleanup; }
+            set
+            {
+                cleanup = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public int QueryLength
-		{
-			get { return queryLength; }
-			set
-			{
-				queryLength = value;
-				OnPropertyChanged();
-			}
-		}
+        public int QueryLength
+        {
+            get { return queryLength; }
+            set
+            {
+                queryLength = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public List<Hit> Hits
-		{
-			get { return hits; }
-			set
-			{
-				hits = value;
-				OnPropertyChanged();
-			}
-		}
+        public string Message
+        {
+            get { return message; }
+            set
+            {
+                message = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public Hit SelectedHit
-		{
-			get { return selectedHit; }
-			set
-			{
-				if (selectedHit != value)
-				{
-					selectedHit = value;
-					selectedSegment = value?.Segments?.FirstOrDefault();
-					OnPropertyChanged();
-					OnPropertyChanged(nameof(SelectedSegment));
-				}
-			}
-		}
+        public List<Hit> Hits
+        {
+            get { return hits; }
+            set
+            {
+                hits = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public SegmentPair SelectedSegment
-		{
-			get { return selectedSegment; }
-			set
-			{
-				if (selectedSegment != value)
-				{
-					selectedSegment = value;
-					selectedHit = value?.Parent;
-					OnPropertyChanged();
-					OnPropertyChanged(nameof(SelectedHit));
-				}
-			}
-		}
+        public Hit SelectedHit
+        {
+            get { return selectedHit; }
+            set
+            {
+                if (selectedHit != value)
+                {
+                    selectedHit = value;
+                    selectedSegment = value?.Segments?.FirstOrDefault();
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedSegment));
+                }
+            }
+        }
 
-		public string QueryPaneHeight
-		{
-			get { return Settings.Default.BlastpQueryPaneHeight; }
-			set
-			{
-				Settings.Default.BlastpQueryPaneHeight = value;
-				OnPropertyChanged();
-			}
-		}
+        public SegmentPair SelectedSegment
+        {
+            get { return selectedSegment; }
+            set
+            {
+                if (selectedSegment != value)
+                {
+                    selectedSegment = value;
+                    selectedHit = value?.Parent;
+                    OnPropertyChanged();
+                    OnPropertyChanged(nameof(SelectedHit));
+                }
+            }
+        }
 
-		public string ResultPaneHeight
-		{
-			get { return Settings.Default.BlastpResultPaneHeight; }
-			set
-			{
-				Settings.Default.BlastpResultPaneHeight = value;
-				OnPropertyChanged();
-			}
-		}
+        public string QueryPaneHeight
+        {
+            get { return Settings.Default.BlastpQueryPaneHeight; }
+            set
+            {
+                Settings.Default.BlastpQueryPaneHeight = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public string DescPaneHeight
-		{
-			get { return Settings.Default.BlastpDescPaneHeight; }
-			set
-			{
-				Settings.Default.BlastpDescPaneHeight = value;
-				OnPropertyChanged();
-			}
-		}
+        public string ResultPaneHeight
+        {
+            get { return Settings.Default.BlastpResultPaneHeight; }
+            set
+            {
+                Settings.Default.BlastpResultPaneHeight = value;
+                OnPropertyChanged();
+            }
+        }
 
-		public async void Run(object parameter)
-		{
-			State = PageState.Running;
-			running = true;
-			RunCommand.OnCanExecuteChanged();
+        public string DescPaneHeight
+        {
+            get { return Settings.Default.BlastpDescPaneHeight; }
+            set
+            {
+                Settings.Default.BlastpDescPaneHeight = value;
+                OnPropertyChanged();
+            }
+        }
 
-			SelectedHit = null;
-			Hits = null;
+        public async void Run(object parameter)
+        {
+            State = PageState.Running;
+            running = true;
+            RunCommand.OnCanExecuteChanged();
 
-			Owner.EnsureWorkingDirectory();
+            SelectedHit = null;
+            Hits = null;
 
-			string queryPath = Path.Combine(Owner.WorkingDirectory, JobID + ".fas");
-			string outPath = Path.Combine(Owner.WorkingDirectory, JobID + ".xml");
+            Owner.EnsureWorkingDirectory();
 
-			File.WriteAllText(queryPath, ">" + JobTitle + Environment.NewLine + Query);
+            string queryPath = Path.Combine(Owner.WorkingDirectory, JobID + ".fas");
+            string outPath = Path.Combine(Owner.WorkingDirectory, JobID + ".xml");
 
-			var psi = new ProcessStartInfo(BlastpPath);
-			psi.Arguments = "-db \"" + BlastpDbPath + "\" -query \"" + queryPath + "\" -out \"" + outPath + "\" -outfmt 16";
-			psi.WindowStyle = ProcessWindowStyle.Hidden;
+            File.WriteAllText(queryPath, ">" + JobTitle + Environment.NewLine + Query);
 
-			using (cts = new CancellationTokenSource())
-			{
-				CancelCommand.OnCanExecuteChanged();
+            var psi = new ProcessStartInfo(BlastpPath);
+            psi.Arguments = "-db \"" + BlastpDbPath + "\" -query \"" + queryPath + "\" -out \"" + outPath + "\" -outfmt 16";
+            psi.WindowStyle = ProcessWindowStyle.Hidden;
 
-				var task = RunBlast(psi, cts.Token);
-				try
-				{
-					await task;
-				}
-				catch
-				{ }
+            using (cts = new CancellationTokenSource())
+            {
+                CancelCommand.OnCanExecuteChanged();
 
-				//string testOutPath = Path.Combine(Owner.WorkingDirectory, "e6aa4ea4-8fbc-4ca0-8513-341e27d6578c.xml");
+                var task = RunBlast(psi, cts.Token);
+                try
+                {
+                    await task;
+                }
+                catch
+                { }
 
-				if (cts != null && !cts.IsCancellationRequested && task.IsCompleted && task.Result == 0 && File.Exists(outPath))
-				//if (File.Exists(testOutPath))
-				{
-					Hits = await Task.Run(() =>
-					{
-						var hits = new List<Hit>();
+                if (cts != null && !cts.IsCancellationRequested && task.IsCompleted && task.Result == 0 && File.Exists(outPath))
+                {
+                    Hits = await Task.Run(() =>
+                    {
+                        var hits = new List<Hit>();
 
-						var xml = XDocument.Load(outPath);
-						//var xml = XDocument.Load(testOutPath);
-						var ns = XNamespace.Get("http://www.ncbi.nlm.nih.gov");
+                        var xml = XDocument.Load(outPath);
+                        //var xml = XDocument.Load(testOutPath);
+                        var ns = XNamespace.Get("http://www.ncbi.nlm.nih.gov");
 
-						var search = xml.Descendants(ns + "Search").First();
-						QueryLength = (int)search.Element(ns + "query-len");
+                        var search = xml.Descendants(ns + "Search").First();
+                        int queryLength = (int)search.Element(ns + "query-len");
+                        string message = (string)search.Element(ns + "message");
 
-						foreach (var hit in search.Descendants(ns + "Hit"))
-							hits.Add(new Hit(this, hit, ns));
+                        App.Current.Dispatcher.Invoke(() =>
+                        {
+                            QueryLength = queryLength;
+                            Message = string.IsNullOrWhiteSpace(message) ? null : message;
+                        });
 
-						return hits;
-					});
+                        foreach (var hit in search.Descendants(ns + "Hit"))
+                            hits.Add(new Hit(this, hit, ns));
 
-					State = PageState.Completed;
-				}
-				else
-					State = PageState.Error;
-			}
-			cts = null;
-			CancelCommand.OnCanExecuteChanged();
+                        return hits;
+                    });
 
-			if (EnableCleanup)
-			{
-				File.Delete(queryPath);
-				File.Delete(outPath);
-			}
+                    State = PageState.Completed;
+                }
+                else
+                    State = PageState.Error;
+            }
+            cts = null;
+            CancelCommand.OnCanExecuteChanged();
 
-			SelectedHit = Hits?.FirstOrDefault();
+            if (EnableCleanup)
+            {
+                File.Delete(queryPath);
+                File.Delete(outPath);
+            }
 
-			running = false;
-			RunCommand.OnCanExecuteChanged();
-		}
+            SelectedHit = Hits?.FirstOrDefault();
 
-		private Task<int> RunBlast(ProcessStartInfo psi, CancellationToken ct)
-		{
-			var tcs = new TaskCompletionSource<int>();
-			var proc = new Process();
-			try
-			{
-				ct.Register(() =>
-				{
-					if (proc != null && !proc.HasExited)
-						proc.Kill();
-				});
+            running = false;
+            RunCommand.OnCanExecuteChanged();
+        }
 
-				proc.EnableRaisingEvents = true;
-				proc.StartInfo = psi;
+        private Task<int> RunBlast(ProcessStartInfo psi, CancellationToken ct)
+        {
+            var tcs = new TaskCompletionSource<int>();
+            var proc = new Process();
+            try
+            {
+                ct.Register(() =>
+                {
+                    if (proc != null && !proc.HasExited)
+                        proc.Kill();
+                });
 
-				proc.Exited += (sender, e) =>
-				{
-					tcs.TrySetResult(proc.ExitCode);
-					proc.Dispose();
-				};
+                proc.EnableRaisingEvents = true;
+                proc.StartInfo = psi;
 
-				proc.Start();
-			}
-			catch (Exception ex)
-			{
-				tcs.TrySetException(ex);
-			}
-			return tcs.Task;
-		}
+                proc.Exited += (sender, e) =>
+                {
+                    tcs.TrySetResult(proc.ExitCode);
+                    proc.Dispose();
+                };
 
-		public bool CanRun(object parameter)
-		{
-			return !running && !string.IsNullOrWhiteSpace(Query);
-		}
+                proc.Start();
+            }
+            catch (Exception ex)
+            {
+                tcs.TrySetException(ex);
+            }
+            return tcs.Task;
+        }
 
-		public void Cancel(object parameter)
-		{
-			cts?.Cancel();
-			State = PageState.Error;
-		}
+        public bool CanRun(object parameter)
+        {
+            return !running && !string.IsNullOrWhiteSpace(Query);
+        }
 
-		public bool CanCancel(object parameter)
-		{
-			return cts != null && !cts.IsCancellationRequested;
-		}
+        public void Cancel(object parameter)
+        {
+            cts?.Cancel();
+            State = PageState.Error;
+        }
 
-		public void Close(object parameter)
-		{
-			if (cts != null)
-			{
-				cts.Cancel();
-				cts.Dispose();
-				cts = null;
-			}
-			Owner.Tabs.Remove(this);
+        public bool CanCancel(object parameter)
+        {
+            return cts != null && !cts.IsCancellationRequested;
+        }
 
-			SelectedHit = null;
-			Hits = null;
-		}
-	}
+        public void Close(object parameter)
+        {
+            if (cts != null)
+            {
+                cts.Cancel();
+                cts.Dispose();
+                cts = null;
+            }
+            Owner.Tabs.Remove(this);
+
+            SelectedHit = null;
+            Hits = null;
+        }
+    }
 }

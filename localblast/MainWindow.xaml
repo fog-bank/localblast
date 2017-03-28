@@ -5,25 +5,28 @@
         Title="Local Blast Runner" Icon="Resources/dbs.ico" SnapsToDevicePixels="True"
         Width="{Binding WindowWidth, Mode=TwoWay}" Height="{Binding WindowHeight, Mode=TwoWay}" 
 		Left="{Binding WindowLeft, Mode=TwoWay}" Top="{Binding WindowTop, Mode=TwoWay}">
-    <Window.Resources>
-        <local:TabTemplateSelector x:Key="itemTemplates" KeySuffix="Header" />
-        <local:TabTemplateSelector x:Key="contentTemplates" KeySuffix="Content" />
-        <AlternationConverter x:Key="bitScoreColor">
-            <SolidColorBrush Color="Black" />
-            <SolidColorBrush Color="Blue" />
-            <SolidColorBrush Color="Lime" />
-            <SolidColorBrush Color="Magenta" />
-            <SolidColorBrush Color="Red" />
-        </AlternationConverter>
-        <GridLengthConverter x:Key="gridLenConv" />
-        <Style TargetType="Button">
-            <Setter Property="Padding" Value="4,2" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-        </Style>
-    </Window.Resources>
-    <Window.DataContext>
-        <local:MainViewModel />
-    </Window.DataContext>
+	<Window.Resources>
+		<local:TabTemplateSelector x:Key="itemTemplates" KeySuffix="Header" />
+		<local:TabTemplateSelector x:Key="contentTemplates" KeySuffix="Content" />
+		<AlternationConverter x:Key="bitScoreColor">
+			<SolidColorBrush Color="Black" />
+			<SolidColorBrush Color="Blue" />
+			<SolidColorBrush Color="Lime" />
+			<SolidColorBrush Color="Magenta" />
+			<SolidColorBrush Color="Red" />
+		</AlternationConverter>
+		<Style TargetType="Button">
+			<Setter Property="Padding" Value="4,2" />
+			<Setter Property="VerticalAlignment" Value="Center" />
+		</Style>
+		<Style x:Key="header" TargetType="TextBlock">
+			<Setter Property="Foreground" Value="#ff3399ff" />
+			<Setter Property="FontSize" Value="14" />
+		</Style>
+	</Window.Resources>
+	<Window.DataContext>
+		<local:MainViewModel />
+	</Window.DataContext>
 	<Grid Grid.IsSharedSizeScope="True">
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition />
@@ -45,13 +48,13 @@
 				<DataTemplate x:Key="NewPageContent" DataType="local:NewPage">
 					<ScrollViewer>
 						<StackPanel Margin="4">
-							<TextBlock>Common settings</TextBlock>
+							<TextBlock Style="{DynamicResource header}">Common settings</TextBlock>
 							<StackPanel Margin="0,4" Orientation="Horizontal">
 								<TextBlock VerticalAlignment="Center">Temporary working directory:</TextBlock>
 								<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Owner.WorkingDirectory}" />
 							</StackPanel>
 							<Separator Margin="0,10" BorderBrush="Gray" BorderThickness="1" />
-							<TextBlock>blastp</TextBlock>
+							<TextBlock Style="{DynamicResource header}">blastp</TextBlock>
 							<StackPanel Margin="0,4" Orientation="Horizontal">
 								<TextBlock VerticalAlignment="Center">Exe path:</TextBlock>
 								<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding BlastpPath}" />
@@ -117,7 +120,7 @@
 						</StackPanel>
 						<ScrollViewer Grid.Row="1">
 							<StackPanel Margin="4">
-								<CheckBox IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
+								<CheckBox HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
 								<StackPanel Margin="0,8" Orientation="Horizontal">
 									<TextBlock>Job ID:</TextBlock>
 									<TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
@@ -137,7 +140,7 @@
 						<GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 						<ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Auto">
 							<StackPanel Margin="4">
-								<TextBlock Margin="0,4,0,4">Result</TextBlock>
+								<TextBlock Style="{DynamicResource header}" Margin="0,4">Result</TextBlock>
 								<StackPanel Name="blastpResult" Margin="0,4" Orientation="Horizontal">
 									<TextBlock>Query length:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding QueryLength}" />
@@ -203,12 +206,13 @@
 										</DataTemplate>
 									</ListBox.ItemTemplate>
 								</ListBox>
+								<TextBlock Text="{Binding Message}" />
 							</StackPanel>
 						</ScrollViewer>
 						<GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 						<ScrollViewer Grid.Row="5" HorizontalScrollBarVisibility="Auto">
 							<StackPanel Name="blastpDescription" Margin="4">
-								<TextBlock Margin="0,4,0,8">Description</TextBlock>
+								<TextBlock Style="{DynamicResource header}" Margin="0,4,0,8">Description</TextBlock>
 								<StackPanel Margin="0,2" Orientation="Horizontal">
 									<TextBlock>Hit rank:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/Index}" />
@@ -242,7 +246,7 @@
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/HitCover, StringFormat=p0}" />
 								</StackPanel>
 								<Separator Height="1" Margin="0,6,0,2" />
-								<TextBlock Margin="0,8">Segment detail</TextBlock>
+								<TextBlock Style="{DynamicResource header}" Margin="0,8">Segment detail</TextBlock>
 								<StackPanel Margin="0,2" Orientation="Horizontal">
 									<TextBlock>Bit score:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.BitScore}" />
