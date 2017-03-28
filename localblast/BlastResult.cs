@@ -97,38 +97,33 @@ namespace LocalBlast
 
             var sb = new StringBuilder(AlignLength + 10);
 
-            for (int i = QueryFrom; i <= QueryTo;)
+            if (QuerySeq != null)
             {
-                if (i % 100 == 1)
+                for (int seqPos = 0, queryPos = QueryFrom - 1; seqPos < QuerySeq.Length; seqPos++)
                 {
-                    string mark = "|" + i;
-                    sb.Append(mark);
-                    i += mark.Length;
-                }
-                else
-                {
-                    sb.Append(' ');
-                    i++;
-                }
-            }
-            QueryScaleMark = sb.ToString();
-            sb.Clear();
+                    if (QuerySeq[seqPos] != '-')
+                        queryPos++;
 
-            for (int i = HitFrom; i <= HitTo;)
-            {
-                if (i % 100 == 1)
-                {
-                    string mark = "|" + i;
-                    sb.Append(mark);
-                    i += mark.Length;
+                    if (sb.Length == seqPos)
+                        sb.Append(queryPos % 100 == 1 ? "|" + queryPos : " ");
                 }
-                else
-                {
-                    sb.Append(' ');
-                    i++;
-                }
+                QueryScaleMark = sb.ToString();
+                sb.Clear();
             }
-            HitScaleMark = sb.ToString();
+
+            if (HitSeq != null)
+            {
+                for (int seqPos = 0, hitPos = HitFrom - 1; seqPos < HitSeq.Length; seqPos++)
+                {
+                    if (HitSeq[seqPos] != '-')
+                        hitPos++;
+
+                    if (sb.Length == seqPos)
+                        sb.Append(hitPos % 100 == 1 ? "|" + hitPos : " ");
+                }
+                HitScaleMark = sb.ToString();
+                sb.Clear();
+            }
         }
 
 		public Hit Parent { get; }
