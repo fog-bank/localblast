@@ -63,6 +63,7 @@ namespace LocalBlast
 			{
 				BlastpPath = dlg.FileName;
 				OpenBlastpCommand.OnCanExecuteChanged();
+                OpenAlginBlastpCommand.OnCanExecuteChanged();
 			}
 		}
 
@@ -75,7 +76,8 @@ namespace LocalBlast
 			{
 				BlastpDbPath = dlg.FileName;
 				OpenBlastpCommand.OnCanExecuteChanged();
-			}
+                OpenAlginBlastpCommand.OnCanExecuteChanged();
+            }
 		}
 
 		public void OpenBlastp(object parameter)

@@ -19,15 +19,21 @@ namespace LocalBlast
 			this.canExecute = canExecute;
 		}
 
-		public void Execute(object parameter)
+		public void Execute(object parameter = null)
 		{
 			execute(parameter);
 		}
 
-		public bool CanExecute(object parameter)
+		public bool CanExecute(object parameter = null)
 		{
 			return canExecute == null || canExecute(parameter);
 		}
+
+        public void TryExecute(object exeParameter = null, object canParameter = null)
+        {
+            if (CanExecute(canParameter))
+                Execute(exeParameter);
+        }
 
 		public void OnCanExecuteChanged()
 		{

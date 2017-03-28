@@ -16,30 +16,37 @@ namespace LocalBlast
 		public MainViewModel ViewModel => DataContext as MainViewModel;
 
 		protected override void OnClosing(CancelEventArgs e)
-		{
-			base.OnClosing(e);
+        {
+            OnCloseAllTab(null, new RoutedEventArgs());
 
-			if (ViewModel != null && ViewModel.Tabs != null)
-			{
-				var cmds = new List<DelegateCommand>(ViewModel.Tabs.Count);
+            base.OnClosing(e);
+        }
 
-				foreach (var page in ViewModel.Tabs)
-				{
-					if (page.CloseCommand.CanExecute(null))
-						cmds.Add(page.CloseCommand);
-				}
+        private void OnCloseAllTab(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel != null && ViewModel.Tabs != null)
+            {
+                ViewModel.SelectedTabIndex = 0;
 
-				foreach (var cmd in cmds)
-					cmd.Execute(null);
-			}
-		}
+                var cmds = new List<DelegateCommand>(ViewModel.Tabs.Count);
 
-		private void SegmentOnMouseEnter(object sender, MouseEventArgs e)
+                foreach (var page in ViewModel.Tabs)
+                {
+                    if (page.CloseCommand.CanExecute())
+                        cmds.Add(page.CloseCommand);
+                }
+
+                foreach (var cmd in cmds)
+                    cmd.Execute();
+            }
+        }
+
+        private void SegmentOnMouseEnter(object sender, MouseEventArgs e)
 		{
 			var rect = sender as Rectangle;
 			var segment = rect.DataContext as SegmentPair;
 			(segment.Parent.Parent as BlastpPage).SelectedSegment = segment;
 
 		}
-	}
+    }
 }
