@@ -75,6 +75,7 @@
     <Compile Include="MainViewModel.cs" />
     <Compile Include="Pages\BlastpPage.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="Pages\MakeBlastDbPage.cs" />
     <Compile Include="Pages\TabPage.cs" />
     <Compile Include="Pages\NewPage.cs" />
     <Compile Include="Pages\TabTemplateSelector.cs" />
@@ -105,6 +106,11 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Resources\dbs.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WindowsAPICodePack-Shell">
+      <Version>1.1.1</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

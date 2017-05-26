@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Win32;
+using Microsoft.WindowsAPICodePack.Dialogs;
 
 namespace LocalBlast
 {
@@ -9,7 +10,6 @@ namespace LocalBlast
 	{
 		private int index = 1;
 
-		private string blastpPath = Settings.Default.BlastpExePath;
 		private string blastpDatabasePath = Settings.Default.BlastpDbPath;
 
 		public NewPage(MainViewModel owner)
@@ -17,7 +17,8 @@ namespace LocalBlast
 		{
 			Header = "New job";
 
-			BrowseBlastpCommand = new DelegateCommand(BrowseBlastp);
+            BrowseBlastBinDirCommand = new DelegateCommand(BrowseBlastBinDir);
+            OpenMakeBlastDbCommand = new DelegateCommand(OpenMakeBlastDb, CanOpenMakeBlastDb);
 			BrowseBlastpDbCommand = new DelegateCommand(BrowseBlastpDb);
 			OpenBlastpCommand = new DelegateCommand(OpenBlastp, CanOpenBlastp);
 			OpenAlginBlastpCommand = new DelegateCommand(OpenAlignBlastp, CanOpenBlastp);
@@ -25,21 +26,12 @@ namespace LocalBlast
 			CloseCommand = new DelegateCommand(null, _ => false);
 		}
 
-		public DelegateCommand BrowseBlastpCommand { get; }
+        public DelegateCommand BrowseBlastBinDirCommand { get; }
+        public DelegateCommand OpenMakeBlastDbCommand { get; }
 		public DelegateCommand BrowseBlastpDbCommand { get; }
 		public DelegateCommand OpenBlastpCommand { get; }
 		public DelegateCommand OpenAlginBlastpCommand { get; }
-
-		public string BlastpPath
-		{
-			get { return blastpPath; }
-			set
-			{
-				blastpPath = value;
-				Settings.Default.BlastpExePath = value;
-				OnPropertyChanged();
-			}
-		}
+        public override DelegateCommand CloseCommand { get; }
 
 		public string BlastpDbPath
 		{
@@ -50,24 +42,38 @@ namespace LocalBlast
 				Settings.Default.BlastpDbPath = value;
 				OnPropertyChanged();
 			}
-		}
+        }
 
-		public override DelegateCommand CloseCommand { get; }
+        public void BrowseBlastBinDir(object parameter)
+        {
+            using (var dlg = new CommonOpenFileDialog())
+            {
+                dlg.IsFolderPicker = true;
 
-		public void BrowseBlastp(object parameter)
-		{
-			var dlg = new OpenFileDialog();
-			dlg.Filter = "blastp program|blastp.exe";
+                if (parameter is string defaultDir && Directory.Exists(defaultDir))
+                    dlg.DefaultDirectory = defaultDir;
 
-			if (dlg.ShowDialog() == true)
-			{
-				BlastpPath = dlg.FileName;
-				OpenBlastpCommand.OnCanExecuteChanged();
-                OpenAlginBlastpCommand.OnCanExecuteChanged();
-			}
-		}
+                if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+                {
+                    Owner.BlastBinDir = dlg.FileName;
 
-		public void BrowseBlastpDb(object parameter)
+                    OpenMakeBlastDbCommand.OnCanExecuteChanged();
+                    OpenBlastpCommand.OnCanExecuteChanged();
+                    OpenAlginBlastpCommand.OnCanExecuteChanged();
+                }
+            }
+        }
+
+        public void OpenMakeBlastDb(object parameter)
+        {
+            var page = new MakeBlastDbPage(Owner);
+            Owner.Tabs.Add(page);
+            Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
+        }
+
+        public bool CanOpenMakeBlastDb(object parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "makeblastdb.exe"));
+
+        public void BrowseBlastpDb(object parameter)
 		{
 			var dlg = new OpenFileDialog();
 			dlg.Filter = "blastp sequence file (*.psq)|*.psq";
@@ -83,7 +89,7 @@ namespace LocalBlast
 		public void OpenBlastp(object parameter)
 		{
 			var blastp = new BlastpPage(Owner);
-			blastp.BlastpPath = BlastpPath;
+			blastp.BlastpPath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
 			blastp.BlastpDbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
 			blastp.JobTitle = "blastp #" + index++;
 
@@ -114,7 +120,7 @@ namespace LocalBlast
 							if (name != null)
 							{
 								var blastp = new BlastpPage(Owner);
-								blastp.BlastpPath = BlastpPath;
+								blastp.BlastpPath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
 								blastp.BlastpDbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
 								blastp.JobTitle = "blastp #" + index++;
 
@@ -143,6 +149,6 @@ namespace LocalBlast
 			}
 		}
 
-		public bool CanOpenBlastp(object parameter) => File.Exists(BlastpPath) && File.Exists(BlastpDbPath);
+		public bool CanOpenBlastp(object parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastp.exe")) && File.Exists(BlastpDbPath);
 	}
 }

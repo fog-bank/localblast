@@ -10,6 +10,7 @@ namespace LocalBlast
     {
         private readonly ObservableCollection<TabPage> tabs = new ObservableCollection<TabPage>();
         private int tabIndex = -1;
+        private string blastBinDir = Settings.Default.BlastBinDir;
         private string wd = Path.Combine(Environment.CurrentDirectory, "Temp\\");
 
         public MainViewModel()
@@ -65,6 +66,17 @@ namespace LocalBlast
             set
             {
                 tabIndex = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BlastBinDir
+        {
+            get { return blastBinDir; }
+            set
+            {
+                blastBinDir = value;
+                Settings.Default.BlastBinDir = value;
                 OnPropertyChanged();
             }
         }
