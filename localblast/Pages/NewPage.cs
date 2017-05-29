@@ -67,6 +67,8 @@ namespace LocalBlast
         public void OpenMakeBlastDb(object parameter)
         {
             var page = new MakeBlastDbPage(Owner);
+            page.MakeBlastDbPath = Path.Combine(Owner.BlastBinDir, "makeblastdb.exe");
+
             Owner.Tabs.Add(page);
             Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
         }
@@ -88,12 +90,12 @@ namespace LocalBlast
 
 		public void OpenBlastp(object parameter)
 		{
-			var blastp = new BlastpPage(Owner);
-			blastp.BlastpPath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
-			blastp.BlastpDbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
-			blastp.JobTitle = "blastp #" + index++;
+			var page = new BlastpPage(Owner);
+			page.BlastpPath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
+			page.BlastpDbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
+			page.JobTitle = "blastp #" + index++;
 
-			Owner.Tabs.Add(blastp);
+			Owner.Tabs.Add(page);
 			Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
 		}
 

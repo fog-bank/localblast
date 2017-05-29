@@ -111,7 +111,9 @@
 					<Grid>
 						<Grid.RowDefinitions>
 							<RowDefinition Height="Auto" />
-							<RowDefinition />
+							<RowDefinition MinHeight="50" />
+							<RowDefinition Height="Auto" />
+							<RowDefinition MinHeight="50" />
 						</Grid.RowDefinitions>
 						<StackPanel Margin="4,4,4,8" Orientation="Horizontal">
 							<Button Command="{Binding RunCommand}">Run</Button>
@@ -127,15 +129,24 @@
 								<StackPanel Margin="0,4" Orientation="Horizontal">
 									<TextBlock VerticalAlignment="Center">Input file (<Run FontStyle="Italic">-in</Run>):</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Input}" />
-									<Button Command="{Binding BrowseInputCommand}">Browse</Button>
+									<Button Command="{Binding BrowseInputFileCommand}">Browse</Button>
 								</StackPanel>
 								<StackPanel Margin="0,4" Orientation="Horizontal">
 									<TextBlock VerticalAlignment="Center">Name of BLAST database (<Run FontStyle="Italic">-out</Run>):</TextBlock>
-									<TextBox Margin="8,0" VerticalAlignment="Center" Text="{Binding Output}" />
-									<Button Command="{Binding BrowseInputCommand}">Browse</Button>
+									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Output}" />
+									<Button Command="{Binding BrowseOutputFileCommand}">Browse</Button>
 								</StackPanel>
 							</StackPanel>
 						</ScrollViewer>
+						<GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+						<Grid Grid.Row="3" Margin="4">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto" />
+								<RowDefinition />
+							</Grid.RowDefinitions>
+							<TextBlock Margin="0,4">Console output:</TextBlock>
+							<ListBox Grid.Row="1" Margin="0,4" ItemsSource="{Binding StdOut}" />
+						</Grid>
 					</Grid>
 				</DataTemplate>
 				<DataTemplate x:Key="BlastpPageContent" DataType="local:BlastpPage">

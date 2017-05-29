@@ -1,22 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 
 namespace LocalBlast
 {
     public class MakeBlastDbPage : TabPage
     {
-        private MakeBlastDbType[] dbTypes = { MakeBlastDbType.Nucleotide, MakeBlastDbType.Protein };
-        private MakeBlastDbType dbType = MakeBlastDbType.Nucleotide;
+        private string path;
         private string input;
         private string output;
+        private MakeBlastDbType[] dbTypes = { MakeBlastDbType.Nucleotide, MakeBlastDbType.Protein };
+        private MakeBlastDbType dbType = MakeBlastDbType.Nucleotide;
 
         private bool running;
         private CancellationTokenSource cts;
+        private ObservableCollection<string> stdout = new ObservableCollection<string>();
 
         public MakeBlastDbPage(MainViewModel owner)
             : base(owner)
@@ -26,21 +28,23 @@ namespace LocalBlast
 
             RunCommand = new DelegateCommand(Run, CanRun);
             CancelCommand = new DelegateCommand(Cancel, CanCancel);
+            BrowseInputFileCommand = new DelegateCommand(BrowseInputFile);
+            BrowseOutputFileCommand = new DelegateCommand(BrowseOutputFile);
             CloseCommand = new DelegateCommand(Close);
         }
 
         public DelegateCommand RunCommand { get; }
         public DelegateCommand CancelCommand { get; }
+        public DelegateCommand BrowseInputFileCommand { get; }
+        public DelegateCommand BrowseOutputFileCommand { get; }
         public override DelegateCommand CloseCommand { get; }
 
-        public MakeBlastDbType[] DbTypes => dbTypes;
-
-        public MakeBlastDbType DbType
+        public string MakeBlastDbPath
         {
-            get { return dbType; }
+            get { return path; }
             set
             {
-                dbType = value;
+                path = value;
                 OnPropertyChanged();
             }
         }
@@ -53,8 +57,10 @@ namespace LocalBlast
                 input = value;
                 OnPropertyChanged();
 
-                if (string.IsNullOrEmpty(input))
+                if (string.IsNullOrEmpty(Output))
                     Output = Path.Combine(Path.GetDirectoryName(value), Path.GetFileNameWithoutExtension(value));
+
+                RunCommand.OnCanExecuteChanged();
             }
         }
 
@@ -68,28 +74,70 @@ namespace LocalBlast
             }
         }
 
+        public MakeBlastDbType[] DbTypes => dbTypes;
+
+        public MakeBlastDbType DbType
+        {
+            get { return dbType; }
+            set
+            {
+                dbType = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public ObservableCollection<string> StdOut => stdout;
+
+        public void BrowseInputFile(object parameter)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.Filter = "All Files|*.*";
+
+            if (dlg.ShowDialog() == true)
+            {
+                Input = dlg.FileName;
+            }
+        }
+
+        public void BrowseOutputFile(object parameter)
+        {
+            var dlg = new SaveFileDialog();
+            dlg.Filter = "All Files|*";
+
+            if (!string.IsNullOrWhiteSpace(Output))
+                dlg.FileName = Output;
+
+            if (dlg.ShowDialog() == true)
+            {
+                Output = dlg.FileName;
+            }
+        }
+
         public async void Run(object parameter)
         {
             State = PageState.Running;
             running = true;
             RunCommand.OnCanExecuteChanged();
+            StdOut.Clear();
 
-            Owner.EnsureWorkingDirectory();
+            string workdir = Path.GetDirectoryName(Output);
 
-            //string queryPath = Path.Combine(Owner.WorkingDirectory, JobID + ".fas");
-            //string outPath = Path.Combine(Owner.WorkingDirectory, JobID + ".xml");
+            if (!Directory.Exists(workdir))
+                Directory.CreateDirectory(workdir);
 
-            //File.WriteAllText(queryPath, ">" + JobTitle + Environment.NewLine + Query);
-
-            //var psi = new ProcessStartInfo(BlastpPath);
-            //psi.Arguments = "-query \"" + queryPath + "\" -out \"" + outPath + "\" -outfmt 16";
-            //psi.WindowStyle = ProcessWindowStyle.Hidden;
+            var psi = new ProcessStartInfo(MakeBlastDbPath);
+            psi.Arguments = "-dbtype \"" + (DbType == MakeBlastDbType.Protein ? "prot" : "nucl") + "\" -in \"" + Input + "\" -out \"" + Output + "\"";
+            psi.UseShellExecute = false;
+            psi.RedirectStandardOutput = true;
+            psi.CreateNoWindow = true;
 
             using (cts = new CancellationTokenSource())
             {
                 CancelCommand.OnCanExecuteChanged();
 
-                Task<int> task = null;
+                var prog = new Progress<string>(msg => StdOut.Add(msg));
+
+                var task = RunMakeBlastDb(psi, cts.Token, prog);
                 try
                 {
                     await task;
@@ -97,10 +145,9 @@ namespace LocalBlast
                 catch
                 { }
 
-                if (cts != null && !cts.IsCancellationRequested && task.IsCompleted && task.Result == 0 && File.Exists(output))
+                if (cts != null && !cts.IsCancellationRequested && task.IsCompleted && task.Result == 0 && 
+                    File.Exists(Output + (DbType == MakeBlastDbType.Protein ? ".psq" : ".nsq")))
                 {
-                    
-
                     State = PageState.Completed;
                 }
                 else
@@ -113,10 +160,44 @@ namespace LocalBlast
             RunCommand.OnCanExecuteChanged();
         }
 
-        public bool CanRun(object parameter)
+        private Task<int> RunMakeBlastDb(ProcessStartInfo psi, CancellationToken ct, IProgress<string> progress)
         {
-            return !running && File.Exists(input);
+            var tcs = new TaskCompletionSource<int>();
+            var proc = new Process();
+            try
+            {
+                ct.Register(() =>
+                {
+                    if (proc != null && !proc.HasExited)
+                        proc.Kill();
+                });
+
+                proc.EnableRaisingEvents = true;
+                proc.StartInfo = psi;
+
+                proc.OutputDataReceived += (sender, e) =>
+                {
+                    if (!string.IsNullOrWhiteSpace(e.Data))
+                        progress.Report(e.Data);
+                };
+
+                proc.Exited += (sender, e) =>
+                {
+                    tcs.TrySetResult(proc.ExitCode);
+                    proc.Dispose();
+                };
+
+                proc.Start();
+                proc.BeginOutputReadLine();
+            }
+            catch (Exception ex)
+            {
+                tcs.TrySetException(ex);
+            }
+            return tcs.Task;
         }
+
+        public bool CanRun(object parameter) => !running && File.Exists(input);
 
         public void Cancel(object parameter)
         {
@@ -124,10 +205,7 @@ namespace LocalBlast
             State = PageState.Error;
         }
 
-        public bool CanCancel(object parameter)
-        {
-            return cts != null && !cts.IsCancellationRequested;
-        }
+        public bool CanCancel(object parameter) => cts != null && !cts.IsCancellationRequested;
 
         public void Close(object parameter)
         {

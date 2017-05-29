@@ -313,10 +313,7 @@ namespace LocalBlast
             return tcs.Task;
         }
 
-        public bool CanRun(object parameter)
-        {
-            return !running && !string.IsNullOrWhiteSpace(Query);
-        }
+        public bool CanRun(object parameter) => !running && !string.IsNullOrWhiteSpace(Query);
 
         public void Cancel(object parameter)
         {
@@ -324,10 +321,7 @@ namespace LocalBlast
             State = PageState.Error;
         }
 
-        public bool CanCancel(object parameter)
-        {
-            return cts != null && !cts.IsCancellationRequested;
-        }
+        public bool CanCancel(object parameter) => cts != null && !cts.IsCancellationRequested;
 
         public void Close(object parameter)
         {
