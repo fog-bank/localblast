@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Windows;
 using Microsoft.Win32;
 using Microsoft.WindowsAPICodePack.Dialogs;
 
@@ -108,6 +109,8 @@ namespace LocalBlast
 			{
 				string name = null;
 				var lines = new List<string>();
+                int ncpu = Environment.ProcessorCount;
+                int concurrents = 0;
 
 				using (var sr = File.OpenText(dlg.FileName))
 				{
@@ -130,7 +133,18 @@ namespace LocalBlast
 								blastp.Query = string.Join(Environment.NewLine, lines);
 
 								if (blastp.CanRun(null))
-									blastp.Run(null);
+                                {
+                                    if (++concurrents > ncpu)
+                                    {
+                                        if (MessageBox.Show("The alignment contains " + concurrents + " sequences. Continue?", 
+                                            "Local BLAST", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    blastp.Run(null);
+                                }
 
 								Owner.Tabs.Add(blastp);
 
