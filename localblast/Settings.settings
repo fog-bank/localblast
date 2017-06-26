@@ -32,5 +32,17 @@
     <Setting Name="BlastBinDir" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="BlastnDbPath" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="BlastnQueryPaneHeight" Type="System.String" Scope="User">
+      <Value Profile="(Default)">*</Value>
+    </Setting>
+    <Setting Name="BlastnResultPaneHeight" Type="System.String" Scope="User">
+      <Value Profile="(Default)">*</Value>
+    </Setting>
+    <Setting Name="BlastnDescPaneHeight" Type="System.String" Scope="User">
+      <Value Profile="(Default)">*</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

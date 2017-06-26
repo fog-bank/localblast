@@ -142,5 +142,53 @@ namespace LocalBlast {
                 this["BlastBinDir"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BlastnDbPath {
+            get {
+                return ((string)(this["BlastnDbPath"]));
+            }
+            set {
+                this["BlastnDbPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string BlastnQueryPaneHeight {
+            get {
+                return ((string)(this["BlastnQueryPaneHeight"]));
+            }
+            set {
+                this["BlastnQueryPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string BlastnResultPaneHeight {
+            get {
+                return ((string)(this["BlastnResultPaneHeight"]));
+            }
+            set {
+                this["BlastnResultPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string BlastnDescPaneHeight {
+            get {
+                return ((string)(this["BlastnDescPaneHeight"]));
+            }
+            set {
+                this["BlastnDescPaneHeight"] = value;
+            }
+        }
     }
 }

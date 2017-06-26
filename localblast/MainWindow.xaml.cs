@@ -6,16 +6,16 @@ using System.Windows.Shapes;
 
 namespace LocalBlast
 {
-	public partial class MainWindow : Window
-	{
-		public MainWindow()
-		{
-			InitializeComponent();
-		}
+    public partial class MainWindow : Window
+    {
+        public MainWindow()
+        {
+            InitializeComponent();
+        }
 
-		public MainViewModel ViewModel => DataContext as MainViewModel;
+        public MainViewModel ViewModel => DataContext as MainViewModel;
 
-		protected override void OnClosing(CancelEventArgs e)
+        protected override void OnClosing(CancelEventArgs e)
         {
             OnCloseAllTab(null, new RoutedEventArgs());
 
@@ -42,11 +42,11 @@ namespace LocalBlast
         }
 
         private void SegmentOnMouseEnter(object sender, MouseEventArgs e)
-		{
-			var rect = sender as Rectangle;
-			var segment = rect.DataContext as SegmentPair;
-			(segment.Parent.Parent as BlastpPage).SelectedSegment = segment;
+        {
+            var rect = sender as Rectangle;
+            var segment = rect.DataContext as SegmentPair;
+            (segment.Parent.Parent as BlastPage).SelectedSegment = segment;
 
-		}
+        }
     }
 }

@@ -9,9 +9,8 @@ namespace LocalBlast
 {
 	public class NewPage : TabPage
 	{
-		private int index = 1;
-
-		private string blastpDatabasePath = Settings.Default.BlastpDbPath;
+        private string blastnDatabasePath = Settings.Default.BlastnDbPath;
+        private string blastpDatabasePath = Settings.Default.BlastpDbPath;
 
 		public NewPage(MainViewModel owner)
 			: base(owner)
@@ -20,7 +19,12 @@ namespace LocalBlast
 
             BrowseBlastBinDirCommand = new DelegateCommand(BrowseBlastBinDir);
             OpenMakeBlastDbCommand = new DelegateCommand(OpenMakeBlastDb, CanOpenMakeBlastDb);
-			BrowseBlastpDbCommand = new DelegateCommand(BrowseBlastpDb);
+
+            BrowseBlastnDbCommand = new DelegateCommand(BrowseBlastnDb);
+            OpenBlastnCommand = new DelegateCommand(OpenBlastn, CanOpenBlastn);
+            OpenAlginBlastnCommand = new DelegateCommand(OpenAlignBlastn, CanOpenBlastn);
+
+            BrowseBlastpDbCommand = new DelegateCommand(BrowseBlastpDb);
 			OpenBlastpCommand = new DelegateCommand(OpenBlastp, CanOpenBlastp);
 			OpenAlginBlastpCommand = new DelegateCommand(OpenAlignBlastp, CanOpenBlastp);
 
@@ -29,12 +33,29 @@ namespace LocalBlast
 
         public DelegateCommand BrowseBlastBinDirCommand { get; }
         public DelegateCommand OpenMakeBlastDbCommand { get; }
-		public DelegateCommand BrowseBlastpDbCommand { get; }
+
+        public DelegateCommand BrowseBlastnDbCommand { get; }
+        public DelegateCommand OpenBlastnCommand { get; }
+        public DelegateCommand OpenAlginBlastnCommand { get; }
+
+        public DelegateCommand BrowseBlastpDbCommand { get; }
 		public DelegateCommand OpenBlastpCommand { get; }
 		public DelegateCommand OpenAlginBlastpCommand { get; }
+
         public override DelegateCommand CloseCommand { get; }
 
-		public string BlastpDbPath
+        public string BlastnDbPath
+        {
+            get { return blastnDatabasePath; }
+            set
+            {
+                blastnDatabasePath = value;
+                Settings.Default.BlastnDbPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string BlastpDbPath
 		{
 			get { return blastpDatabasePath; }
 			set
@@ -76,6 +97,95 @@ namespace LocalBlast
 
         public bool CanOpenMakeBlastDb(object parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "makeblastdb.exe"));
 
+        public void BrowseBlastnDb(object parameter)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.Filter = "blastn sequence file (*.nsq)|*.nsq";
+
+            if (dlg.ShowDialog() == true)
+            {
+                BlastnDbPath = dlg.FileName;
+                OpenBlastnCommand.OnCanExecuteChanged();
+                OpenAlginBlastnCommand.OnCanExecuteChanged();
+            }
+        }
+
+        public void OpenBlastn(object parameter)
+        {
+            var page = new BlastnPage(Owner);
+			page.ExePath = Path.Combine(Owner.BlastBinDir, "blastn.exe");
+            page.DbPath = BlastnDbPath.Substring(0, BlastnDbPath.Length - 4);
+
+            Owner.Tabs.Add(page);
+            Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
+        }
+
+        public bool CanOpenBlastn(object parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastn.exe")) && File.Exists(BlastnDbPath);
+
+        public void OpenAlignBlastn(object parameter)
+        {
+            var dlg = new OpenFileDialog();
+            dlg.Filter = "Alignment file(*.fa*)|*.fa*";
+
+            if (dlg.ShowDialog() == true)
+            {
+                string name = null;
+                var lines = new List<string>();
+                int ncpu = Environment.ProcessorCount;
+                int concurrents = 0;
+
+                using (var sr = File.OpenText(dlg.FileName))
+                {
+                    string line = null;
+                    bool added = false;
+                    do
+                    {
+                        line = sr.ReadLine();
+
+                        if (line == null || line.StartsWith(">"))
+                        {
+                            if (name != null)
+                            {
+                                var page = new BlastnPage(Owner);
+                                page.ExePath = Path.Combine(Owner.BlastBinDir, "blastn.exe");
+                                page.DbPath = BlastnDbPath.Substring(0, BlastnDbPath.Length - 4);
+
+                                page.JobTitle = name;
+                                page.Query = string.Join(Environment.NewLine, lines);
+
+                                if (page.CanRun(null))
+                                {
+                                    if (++concurrents > ncpu)
+                                    {
+                                        if (MessageBox.Show("The alignment contains " + concurrents + "+ sequences. Continue?",
+                                            "Local BLAST", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                                        {
+                                            break;
+                                        }
+                                    }
+
+                                    page.Run(null);
+                                }
+
+                                Owner.Tabs.Add(page);
+
+                                if (!added)
+                                {
+                                    Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
+                                    added = true;
+                                }
+                            }
+                            name = line?.Substring(1);
+                            lines.Clear();
+                        }
+                        else
+                            lines.Add(line);
+                    }
+                    while (line != null);
+                }
+            }
+        }
+
         public void BrowseBlastpDb(object parameter)
 		{
 			var dlg = new OpenFileDialog();
@@ -92,9 +202,8 @@ namespace LocalBlast
 		public void OpenBlastp(object parameter)
 		{
 			var page = new BlastpPage(Owner);
-			page.BlastpPath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
-			page.BlastpDbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
-			page.JobTitle = "blastp #" + index++;
+			page.ExePath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
+			page.DbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
 
 			Owner.Tabs.Add(page);
 			Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
@@ -125,9 +234,8 @@ namespace LocalBlast
 							if (name != null)
 							{
 								var blastp = new BlastpPage(Owner);
-								blastp.BlastpPath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
-								blastp.BlastpDbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
-								blastp.JobTitle = "blastp #" + index++;
+								blastp.ExePath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
+								blastp.DbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
 
 								blastp.JobTitle = name;
 								blastp.Query = string.Join(Environment.NewLine, lines);
@@ -136,7 +244,7 @@ namespace LocalBlast
                                 {
                                     if (++concurrents > ncpu)
                                     {
-                                        if (MessageBox.Show("The alignment contains " + concurrents + " sequences. Continue?", 
+                                        if (MessageBox.Show("The alignment contains " + concurrents + "+ sequences. Continue?", 
                                             "Local BLAST", MessageBoxButton.YesNo) == MessageBoxResult.No)
                                         {
                                             break;

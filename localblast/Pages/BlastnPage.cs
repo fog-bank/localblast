@@ -1,41 +1,41 @@
 ﻿namespace LocalBlast
 {
-    public class BlastpPage : BlastPage
+    public class BlastnPage : BlastPage
     {
         private static int index = 1;
 
-        public BlastpPage(MainViewModel owner)
+        public BlastnPage(MainViewModel owner)
             : base(owner)
         {
-            JobTitle = "blastp #" + index++;
+            JobTitle = "blastn #" + index++;
         }
 
         public string QueryPaneHeight
         {
-            get { return Settings.Default.BlastpQueryPaneHeight; }
+            get { return Settings.Default.BlastnQueryPaneHeight; }
             set
             {
-                Settings.Default.BlastpQueryPaneHeight = value;
+                Settings.Default.BlastnQueryPaneHeight = value;
                 OnPropertyChanged();
             }
         }
 
         public string ResultPaneHeight
         {
-            get { return Settings.Default.BlastpResultPaneHeight; }
+            get { return Settings.Default.BlastnResultPaneHeight; }
             set
             {
-                Settings.Default.BlastpResultPaneHeight = value;
+                Settings.Default.BlastnResultPaneHeight = value;
                 OnPropertyChanged();
             }
         }
 
         public string DescPaneHeight
         {
-            get { return Settings.Default.BlastpDescPaneHeight; }
+            get { return Settings.Default.BlastnDescPaneHeight; }
             set
             {
-                Settings.Default.BlastpDescPaneHeight = value;
+                Settings.Default.BlastnDescPaneHeight = value;
                 OnPropertyChanged();
             }
         }

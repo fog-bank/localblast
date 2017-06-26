@@ -8,7 +8,7 @@ namespace LocalBlast
 {
     public class Hit
     {
-        public Hit(TabPage owner, XElement hitElement, XNamespace ns)
+        public Hit(TabPage owner, XNamespace ns, XElement hitElement, int queryLength)
         {
             Parent = owner;
             Index = (int)hitElement.Element(ns + "num");
@@ -40,7 +40,7 @@ namespace LocalBlast
             }
             MaxBitScore = bitScore;
             MinEValue = minEValue;
-            QueryCover = (double)queryLoc.TotalLength / (owner as BlastpPage).QueryLength;
+            QueryCover = (double)queryLoc.TotalLength / queryLength;
             HitCover = (double)hitLoc.TotalLength / Length;
             QueryFrom = queryLoc.From;
             QueryTo = queryLoc.To;
@@ -84,11 +84,13 @@ namespace LocalBlast
             Score = (int)hspElement.Element(ns + "score");
             EValue = (double)hspElement.Element(ns + "evalue");
             Identity = (int)hspElement.Element(ns + "identity");
-            Positive = (int)hspElement.Element(ns + "positive");
+            Positive = (int?)hspElement.Element(ns + "positive") ?? 0;
             QueryFrom = (int)hspElement.Element(ns + "query-from");
             QueryTo = (int)hspElement.Element(ns + "query-to");
+            QueryStrand = (string)hspElement.Element(ns + "query-strand");
             HitFrom = (int)hspElement.Element(ns + "hit-from");
             HitTo = (int)hspElement.Element(ns + "hit-to");
+            HitStrand = (string)hspElement.Element(ns + "hit-strand");
             AlignLength = (int)hspElement.Element(ns + "align-len");
             Gaps = (int)hspElement.Element(ns + "gaps");
             QuerySeq = (string)hspElement.Element(ns + "qseq");
@@ -146,9 +148,13 @@ namespace LocalBlast
 
         public int QueryTo { get; }
 
+        public string QueryStrand { get; }
+
         public int HitFrom { get; }
 
         public int HitTo { get; }
+
+        public string HitStrand { get; }
 
         public int AlignLength { get; }
 

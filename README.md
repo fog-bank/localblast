@@ -9,4 +9,6 @@
 * Databases (or sequence data for `makeblastdb`)
 
 ## Currently Supported Softwares
+* makeblastdb
+* blastn
 * blastp
