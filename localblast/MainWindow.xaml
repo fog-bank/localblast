@@ -213,6 +213,11 @@
 								</StackPanel>
 								<ListBox Name="blastpGraphicSummary" ItemsSource="{Binding Hits}" HorizontalAlignment="Left"
 										 SelectedItem="{Binding SelectedHit}" IsSynchronizedWithCurrentItem="True">
+									<ListBox.ItemsPanel>
+										<ItemsPanelTemplate>
+											<VirtualizingStackPanel />
+										</ItemsPanelTemplate>
+									</ListBox.ItemsPanel>
 									<ListBox.ItemTemplate>
 										<DataTemplate DataType="local:Hit">
 											<ItemsControl ItemsSource="{Binding Segments}">
@@ -390,17 +395,11 @@
 									<TextBlock Margin="2,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.HitStrand}" />
 									<TextBlock>):</TextBlock>
 								</StackPanel>
-								<TextBlock FontFamily="Courier New">
-									<Run Text="{Binding SelectedSegment.QueryScaleMark, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.QuerySeq, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.Alignment, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.HitSeq, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.HitScaleMark, Mode=OneWay}" />
-								</TextBlock>
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.QueryScaleMark, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.QuerySeq, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.Alignment, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.HitSeq, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.HitScaleMark, Mode=OneWay}" />
 							</StackPanel>
 						</ScrollViewer>
 					</Grid>
@@ -458,6 +457,11 @@
 								</StackPanel>
 								<ListBox Name="blastpGraphicSummary" ItemsSource="{Binding Hits}" HorizontalAlignment="Left"
 										 SelectedItem="{Binding SelectedHit}" IsSynchronizedWithCurrentItem="True">
+									<ListBox.ItemsPanel>
+										<ItemsPanelTemplate>
+											<VirtualizingStackPanel />
+										</ItemsPanelTemplate>
+									</ListBox.ItemsPanel>
 									<ListBox.ItemTemplate>
 										<DataTemplate DataType="local:Hit">
 											<ItemsControl ItemsSource="{Binding Segments}">
@@ -633,17 +637,11 @@
 									<TextBlock Margin="2,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.HitTo}" />
 									<TextBlock>):</TextBlock>
 								</StackPanel>
-								<TextBlock FontFamily="Courier New">
-									<Run Text="{Binding SelectedSegment.QueryScaleMark, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.QuerySeq, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.Alignment, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.HitSeq, Mode=OneWay}" />
-									<LineBreak />
-									<Run Text="{Binding SelectedSegment.HitScaleMark, Mode=OneWay}" />
-								</TextBlock>
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.QueryScaleMark, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.QuerySeq, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.Alignment, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.HitSeq, Mode=OneWay}" />
+								<TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.HitScaleMark, Mode=OneWay}" />
 							</StackPanel>
 						</ScrollViewer>
 					</Grid>
