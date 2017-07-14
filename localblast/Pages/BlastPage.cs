@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Xml.Linq;
 using Microsoft.Win32;
 
@@ -36,12 +38,22 @@ namespace LocalBlast
             RunCommand = new DelegateCommand(Run, CanRun);
             CancelCommand = new DelegateCommand(Cancel, CanCancel);
             LoadSequenceCommand = new DelegateCommand(LoadSequence, CanLoadSequence);
+            PreviousHitCommand = new DelegateCommand(PreviousHit, CanPreviousHit);
+            NextHitCommand = new DelegateCommand(NextHit, CanNextHit);
+            PreviousSegmentPairCommand = new DelegateCommand(PreviousSegmentPair, CanPreviousSegmentPair);
+            NextSegmentPairCommand = new DelegateCommand(NextSegmentPair, CanNextSegmentPair);
+            CopyAlignmentCommand = new DelegateCommand(CopyAlignment);
             CloseCommand = new DelegateCommand(Close);
         }
 
         public DelegateCommand RunCommand { get; }
         public DelegateCommand CancelCommand { get; }
         public DelegateCommand LoadSequenceCommand { get; }
+        public DelegateCommand PreviousHitCommand { get; }
+        public DelegateCommand NextHitCommand { get; }
+        public DelegateCommand PreviousSegmentPairCommand { get; }
+        public DelegateCommand NextSegmentPairCommand { get; }
+        public DelegateCommand CopyAlignmentCommand { get; }
         public override DelegateCommand CloseCommand { get; }
 
         public string ExePath
@@ -156,8 +168,13 @@ namespace LocalBlast
                 {
                     selectedHit = value;
                     selectedSegment = value?.Segments?.FirstOrDefault();
+
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(SelectedSegment));
+                    PreviousHitCommand.OnCanExecuteChanged();
+                    NextHitCommand.OnCanExecuteChanged();
+                    PreviousSegmentPairCommand.OnCanExecuteChanged();
+                    NextSegmentPairCommand.OnCanExecuteChanged();
                 }
             }
         }
@@ -171,8 +188,13 @@ namespace LocalBlast
                 {
                     selectedSegment = value;
                     selectedHit = value?.Parent;
+
                     OnPropertyChanged();
                     OnPropertyChanged(nameof(SelectedHit));
+                    PreviousHitCommand.OnCanExecuteChanged();
+                    NextHitCommand.OnCanExecuteChanged();
+                    PreviousSegmentPairCommand.OnCanExecuteChanged();
+                    NextSegmentPairCommand.OnCanExecuteChanged();
                 }
             }
         }
@@ -335,6 +357,66 @@ namespace LocalBlast
         public bool CanCancel(object parameter)
         {
             return cts != null && !cts.IsCancellationRequested;
+        }
+
+        public void PreviousHit(object parameter)
+        {
+            SelectedHit = Hits[SelectedHit.Index - 2];
+        }
+
+        public bool CanPreviousHit(object parameter)
+        {
+            return SelectedHit != null && SelectedHit.Index >= 2 && SelectedHit.Index <= Hits.Count;
+        }
+
+        public void NextHit(object parameter)
+        {
+            SelectedHit = Hits[SelectedHit.Index];
+        }
+
+        public bool CanNextHit(object parameter)
+        {
+            return SelectedHit != null && SelectedHit.Index >= 1 && SelectedHit.Index <= Hits.Count - 1;
+        }
+
+        public void PreviousSegmentPair(object parameter)
+        {
+            SelectedSegment = SelectedHit.Segments[SelectedSegment.Index - 2];
+        }
+
+        public bool CanPreviousSegmentPair(object parameter)
+        {
+            return SelectedHit != null && SelectedSegment != null && SelectedSegment.Index >= 2 && SelectedSegment.Index <= SelectedHit.Segments.Count;
+        }
+
+        public void NextSegmentPair(object parameter)
+        {
+            SelectedSegment = SelectedHit.Segments[SelectedSegment.Index];
+        }
+
+        public bool CanNextSegmentPair(object parameter)
+        {
+            return SelectedHit != null && SelectedSegment != null && SelectedSegment.Index >= 1 && SelectedSegment.Index <= SelectedHit.Segments.Count - 1;
+        }
+
+        public void CopyAlignment(object parameter)
+        {
+            if (SelectedSegment == null)
+                return;
+
+            var seg = SelectedSegment;
+
+            var sb = new StringBuilder();
+            string queryName = sb.Append("Query:").Append(seg.QueryFrom).Append("..").Append(seg.QueryTo).ToString();
+            sb.Clear();
+
+            string hitName = sb.Append("Hit:").Append(seg.HitFrom).Append("..").Append(seg.HitTo).ToString();
+            sb.Clear();
+
+            sb.Capacity = queryName.Length + seg.QuerySeq.Length + hitName.Length + seg.HitSeq.Length + 5;
+
+            sb.Append(">").AppendLine(queryName).AppendLine(seg.QuerySeq).Append(">").AppendLine(hitName).Append(seg.QuerySeq);
+            Clipboard.SetText(sb.ToString());
         }
 
         public void Close(object parameter)

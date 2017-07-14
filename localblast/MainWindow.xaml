@@ -23,6 +23,13 @@
 			<Setter Property="Foreground" Value="#ff3399ff" />
 			<Setter Property="FontSize" Value="14" />
 		</Style>
+		<Style x:Key="btnImage" TargetType="Image">
+			<Style.Triggers>
+				<Trigger Property="IsEnabled" Value="False">
+					<Setter Property="Opacity" Value="0.5" />
+				</Trigger>
+			</Style.Triggers>
+		</Style>
 	</Window.Resources>
 	<Window.DataContext>
 		<local:MainViewModel />
@@ -271,7 +278,27 @@
 						<GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 						<ScrollViewer Grid.Row="5" HorizontalScrollBarVisibility="Auto">
 							<StackPanel Name="blastpDescription" Margin="4">
-								<TextBlock Style="{DynamicResource header}" Margin="0,4,0,8">Description</TextBlock>
+								<StackPanel Margin="0,4,0,8" Orientation="Horizontal">
+									<TextBlock Style="{DynamicResource header}" VerticalAlignment="Center">Description</TextBlock>
+									<ToolBar Margin="4">
+										<ToolBar.Template>
+											<ControlTemplate TargetType="ToolBar">
+												<ItemsPresenter />
+											</ControlTemplate>
+										</ToolBar.Template>
+										<ToolBar.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal" />
+											</ItemsPanelTemplate>
+										</ToolBar.ItemsPanel>
+										<Button Command="{Binding PreviousHitCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/top.png" Height="16" />
+										</Button>
+										<Button Command="{Binding NextHitCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/bottom.png" Height="16" />
+										</Button>
+									</ToolBar>
+								</StackPanel>
 								<StackPanel Margin="0,2" Orientation="Horizontal">
 									<TextBlock>Hit rank:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/Index}" />
@@ -305,7 +332,30 @@
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/HitCover, StringFormat=p0}" />
 								</StackPanel>
 								<Separator Height="1" Margin="0,6,0,2" />
-								<TextBlock Style="{DynamicResource header}" Margin="0,8">Segment detail</TextBlock>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Style="{DynamicResource header}" Margin="0,8,4,8" VerticalAlignment="Center">
+										Segment detail #<Run Text="{Binding SelectedSegment.Index, Mode=OneWay}"/>
+									</TextBlock>
+									<ToolBar Margin="4">
+										<ToolBar.Template>
+											<ControlTemplate TargetType="ToolBar">
+												<ItemsPresenter />
+											</ControlTemplate>
+										</ToolBar.Template>
+										<ToolBar.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal" />
+											</ItemsPanelTemplate>
+										</ToolBar.ItemsPanel>
+										<Button Command="{Binding PreviousSegmentPairCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/previous.png" Height="16" />
+										</Button>
+										<Button Command="{Binding NextSegmentPairCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/next.png" Height="16" />
+										</Button>
+									</ToolBar>
+									<Button Margin="4" Command="{Binding CopyAlignmentCommand}">Copy alignment</Button>
+								</StackPanel>
 								<StackPanel Margin="0,2" Orientation="Horizontal">
 									<TextBlock>Bit score:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.BitScore}" />
@@ -473,7 +523,27 @@
 						<GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 						<ScrollViewer Grid.Row="5" HorizontalScrollBarVisibility="Auto">
 							<StackPanel Name="blastpDescription" Margin="4">
-								<TextBlock Style="{DynamicResource header}" Margin="0,4,0,8">Description</TextBlock>
+								<StackPanel Margin="0,4,0,8" Orientation="Horizontal">
+									<TextBlock Style="{DynamicResource header}" VerticalAlignment="Center">Description</TextBlock>
+									<ToolBar Margin="4">
+										<ToolBar.Template>
+											<ControlTemplate TargetType="ToolBar">
+												<ItemsPresenter />
+											</ControlTemplate>
+										</ToolBar.Template>
+										<ToolBar.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal" />
+											</ItemsPanelTemplate>
+										</ToolBar.ItemsPanel>
+										<Button Command="{Binding PreviousHitCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/top.png" Height="16" />
+										</Button>
+										<Button Command="{Binding NextHitCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/bottom.png" Height="16" />
+										</Button>
+									</ToolBar>
+								</StackPanel>
 								<StackPanel Margin="0,2" Orientation="Horizontal">
 									<TextBlock>Hit rank:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/Index}" />
@@ -507,7 +577,30 @@
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/HitCover, StringFormat=p0}" />
 								</StackPanel>
 								<Separator Height="1" Margin="0,6,0,2" />
-								<TextBlock Style="{DynamicResource header}" Margin="0,8">Segment detail</TextBlock>
+								<StackPanel Orientation="Horizontal">
+									<TextBlock Style="{DynamicResource header}" Margin="0,8,4,8" VerticalAlignment="Center">
+										Segment detail #<Run Text="{Binding SelectedSegment.Index, Mode=OneWay}"/>
+									</TextBlock>
+									<ToolBar Margin="4">
+										<ToolBar.Template>
+											<ControlTemplate TargetType="ToolBar">
+												<ItemsPresenter />
+											</ControlTemplate>
+										</ToolBar.Template>
+										<ToolBar.ItemsPanel>
+											<ItemsPanelTemplate>
+												<StackPanel Orientation="Horizontal" />
+											</ItemsPanelTemplate>
+										</ToolBar.ItemsPanel>
+										<Button Command="{Binding PreviousSegmentPairCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/previous.png" Height="16" />
+										</Button>
+										<Button Command="{Binding NextSegmentPairCommand}">
+											<Image Style="{DynamicResource btnImage}" Source="Resources/next.png" Height="16" />
+										</Button>
+									</ToolBar>
+									<Button Margin="4" Command="{Binding CopyAlignmentCommand}">Copy alignment</Button>
+								</StackPanel>
 								<StackPanel Margin="0,2" Orientation="Horizontal">
 									<TextBlock>Bit score:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.BitScore}" />
