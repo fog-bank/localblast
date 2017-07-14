@@ -191,7 +191,7 @@
 										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
 								<StackPanel Margin="0,4" Orientation="Horizontal">
 									<TextBlock>Database:</TextBlock>
-									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding BlastnDbPath}" />
+									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
 								</StackPanel>
 								<Expander Header="Parameters" Margin="0,4" />
 							</StackPanel>
@@ -393,7 +393,7 @@
 										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
 								<StackPanel Margin="0,4" Orientation="Horizontal">
 									<TextBlock>Database:</TextBlock>
-									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding BlastpDbPath}" />
+									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
 								</StackPanel>
 								<Expander Header="Parameters" Margin="0,4" />
 							</StackPanel>
