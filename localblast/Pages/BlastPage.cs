@@ -250,8 +250,23 @@ namespace LocalBlast
 
             File.WriteAllText(queryPath, ">" + JobTitle + Environment.NewLine + Query);
 
+            var arglist = new Dictionary<string, string>();
+            arglist["db"] = "\"" + DbPath + "\"";
+            arglist["query"] = "\"" + queryPath + "\"";
+            arglist["out"] = "\"" + outPath + "\"";
+            arglist["outfmt"] = "16";
+
+            SetArgument(arglist);
+
+            var sb = new StringBuilder();
+
+            foreach (var pair in arglist)
+                sb.Append("-").Append(pair.Key).Append(" ").Append(pair.Value).Append(" ");
+
+            sb.Length--;
+
             var psi = new ProcessStartInfo(ExePath);
-            psi.Arguments = "-db \"" + DbPath + "\" -query \"" + queryPath + "\" -out \"" + outPath + "\" -outfmt 16";
+            psi.Arguments = sb.ToString();
             psi.WindowStyle = ProcessWindowStyle.Hidden;
 
             using (cts = new CancellationTokenSource())
@@ -419,7 +434,7 @@ namespace LocalBlast
             Clipboard.SetText(sb.ToString());
         }
 
-        public void Close(object parameter)
+        public virtual void Close(object parameter)
         {
             if (cts != null)
             {
@@ -431,6 +446,10 @@ namespace LocalBlast
 
             SelectedHit = null;
             Hits = null;
+        }
+
+        protected virtual void SetArgument(Dictionary<string, string> arglist)
+        {
         }
     }
 }

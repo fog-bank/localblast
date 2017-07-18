@@ -190,5 +190,29 @@ namespace LocalBlast {
                 this["BlastnDescPaneHeight"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Megablast")]
+        public string BlastnTask {
+            get {
+                return ((string)(this["BlastnTask"]));
+            }
+            set {
+                this["BlastnTask"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int BlastnMaxTargetSeqs {
+            get {
+                return ((int)(this["BlastnMaxTargetSeqs"]));
+            }
+            set {
+                this["BlastnMaxTargetSeqs"] = value;
+            }
+        }
     }
 }

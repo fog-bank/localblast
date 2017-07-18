@@ -13,7 +13,6 @@ namespace LocalBlast
         private string path;
         private string input;
         private string output;
-        private MakeBlastDbType[] dbTypes = { MakeBlastDbType.Nucleotide, MakeBlastDbType.Protein };
         private MakeBlastDbType dbType = MakeBlastDbType.Nucleotide;
 
         private bool running;
@@ -74,7 +73,7 @@ namespace LocalBlast
             }
         }
 
-        public MakeBlastDbType[] DbTypes => dbTypes;
+        public MakeBlastDbType[] DbTypes { get; } = new[] { MakeBlastDbType.Nucleotide, MakeBlastDbType.Protein };
 
         public MakeBlastDbType DbType
         {

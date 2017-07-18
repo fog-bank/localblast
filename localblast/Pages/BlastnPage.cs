@@ -1,13 +1,21 @@
-﻿namespace LocalBlast
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+
+namespace LocalBlast
 {
     public class BlastnPage : BlastPage
     {
         private static int index = 1;
+        private BlastnTask task;
+        private int maxTargetSeqs = Settings.Default.BlastnMaxTargetSeqs;
 
         public BlastnPage(MainViewModel owner)
             : base(owner)
         {
             JobTitle = "blastn #" + index++;
+
+            Enum.TryParse(Settings.Default.BlastnTask, out task);
         }
 
         public string QueryPaneHeight
@@ -39,5 +47,95 @@
                 OnPropertyChanged();
             }
         }
+
+        public BlastnTask[] Tasks { get; } = new[] { BlastnTask.Megablast, BlastnTask.DiscontiguousMegablast, BlastnTask.Blastn, BlastnTask.BlastnShort };
+
+        /// <summary>
+        /// Gets or sets the program to execute.
+        /// </summary>
+        public BlastnTask Task
+        {
+            get => task;
+            set
+            {
+                task = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the maximum number of aligned sequences to keep.
+        /// </summary>
+        public int MaxTargetSequences
+        {
+            get => maxTargetSeqs;
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(value));
+
+                maxTargetSeqs = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public override void Close(object parameter)
+        {
+            base.Close(parameter);
+
+            Settings.Default.BlastnTask = Task.ToString();
+            Settings.Default.BlastnMaxTargetSeqs = MaxTargetSequences;
+        }
+
+        protected override void SetArgument(Dictionary<string, string> arglist)
+        {
+            base.SetArgument(arglist);
+
+            var culture = CultureInfo.InvariantCulture;
+
+            switch (Task)
+            {
+                case BlastnTask.DiscontiguousMegablast:
+                    arglist["task"] = "dc-megablast";
+                    break;
+
+                case BlastnTask.Blastn:
+                    arglist["task"] = "blastn";
+                    break;
+
+                case BlastnTask.BlastnShort:
+                    arglist["task"] = "blastn-short";
+                    break;
+
+                default:
+                    arglist["task"] = "megablast";
+                    break;
+            }
+
+            arglist["max_target_seqs"] = MaxTargetSequences.ToString(culture);
+        }
+    }
+
+    public enum BlastnTask
+    {
+        /// <summary>
+        /// For similar sequences (e.g, sequencing errors).
+        /// </summary>
+        Megablast,
+
+        /// <summary>
+        /// Typically used for inter-species comparisons.
+        /// </summary>
+        DiscontiguousMegablast,
+
+        /// <summary>
+        /// The traditional program used for inter-species comparisons.
+        /// </summary>
+        Blastn,
+
+        /// <summary>
+        /// Optimized for sequences less than 30 nucleotides.
+        /// </summary>
+        BlastnShort
     }
 }

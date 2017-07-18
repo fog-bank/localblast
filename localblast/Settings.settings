@@ -44,5 +44,11 @@
     <Setting Name="BlastnDescPaneHeight" Type="System.String" Scope="User">
       <Value Profile="(Default)">*</Value>
     </Setting>
+    <Setting Name="BlastnTask" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Megablast</Value>
+    </Setting>
+    <Setting Name="BlastnMaxTargetSeqs" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
