@@ -202,14 +202,18 @@
 								</StackPanel>
 								<Expander Header="Parameters" Margin="0,4">
 									<StackPanel>
-										<StackPanel Margin="0,4" Orientation="Horizontal">
+										<StackPanel Margin="0,2" Orientation="Horizontal">
 											<TextBlock VerticalAlignment="Center">BLAST algorithm (<Run FontStyle="Italic">-task</Run>):</TextBlock>
 											<ComboBox Margin="4" MinWidth="100" HorizontalAlignment="Left" 
 													  ItemsSource="{Binding Tasks, Mode=OneTime}" SelectedItem="{Binding Task}" />
 										</StackPanel>
-										<StackPanel Margin="0,4" Orientation="Horizontal">
+										<StackPanel Margin="0,2" Orientation="Horizontal">
 											<TextBlock VerticalAlignment="Center">Max target sequences (<Run FontStyle="Italic">-max_target_seqs</Run>):</TextBlock>
 											<TextBox Margin="4" MinWidth="100" Text="{Binding MaxTargetSequences}" />
+										</StackPanel>
+										<StackPanel Margin="0,2" Orientation="Horizontal">
+											<TextBlock VerticalAlignment="Center">Max matches in a query range (<Run FontStyle="Italic">-max_hsps</Run>):</TextBlock>
+											<TextBox Margin="4" MinWidth="100" Text="{Binding MaxHitSegmentPairs}" />
 										</StackPanel>
 									</StackPanel>
 								</Expander>

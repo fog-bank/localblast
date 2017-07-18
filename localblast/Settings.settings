@@ -50,5 +50,8 @@
     <Setting Name="BlastnMaxTargetSeqs" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">500</Value>
     </Setting>
+    <Setting Name="BlastnMaxHsps" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">500</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

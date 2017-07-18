@@ -8,6 +8,7 @@ namespace LocalBlast
     {
         private static int index = 1;
         private BlastnTask task;
+        private int maxHsps = Settings.Default.BlastnMaxHsps;
         private int maxTargetSeqs = Settings.Default.BlastnMaxTargetSeqs;
 
         public BlastnPage(MainViewModel owner)
@@ -64,6 +65,22 @@ namespace LocalBlast
         }
 
         /// <summary>
+        /// Gets or sets the maximum number of HSPs per subject sequence to save for each query
+        /// </summary>
+        public int MaxHitSegmentPairs
+        {
+            get => maxHsps;
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(value));
+
+                maxHsps = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
         /// Gets or sets the maximum number of aligned sequences to keep.
         /// </summary>
         public int MaxTargetSequences
@@ -84,6 +101,7 @@ namespace LocalBlast
             base.Close(parameter);
 
             Settings.Default.BlastnTask = Task.ToString();
+            Settings.Default.BlastnMaxHsps = MaxHitSegmentPairs;
             Settings.Default.BlastnMaxTargetSeqs = MaxTargetSequences;
         }
 
@@ -112,6 +130,7 @@ namespace LocalBlast
                     break;
             }
 
+            arglist["max_hsps"] = MaxHitSegmentPairs.ToString(culture);
             arglist["max_target_seqs"] = MaxTargetSequences.ToString(culture);
         }
     }
