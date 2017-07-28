@@ -77,6 +77,7 @@
     <Compile Include="Pages\BlastPage.cs" />
     <Compile Include="Pages\BlastpPage.cs" />
     <Compile Include="DelegateCommand.cs" />
+    <Compile Include="Pages\BlastxPage.cs" />
     <Compile Include="Pages\MakeBlastDbPage.cs" />
     <Compile Include="Pages\TabPage.cs" />
     <Compile Include="Pages\NewPage.cs" />

@@ -323,6 +323,9 @@ namespace LocalBlast
 
             SelectedHit = Hits?.FirstOrDefault();
 
+            if (SelectedHit == null)
+                Message = "Query length:  " + QueryLength + Environment.NewLine + Environment.NewLine + Message; 
+
             running = false;
             RunCommand.OnCanExecuteChanged();
             LoadSequenceCommand.OnCanExecuteChanged();

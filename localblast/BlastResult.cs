@@ -88,14 +88,22 @@ namespace LocalBlast
             QueryFrom = (int)hspElement.Element(ns + "query-from");
             QueryTo = (int)hspElement.Element(ns + "query-to");
             QueryStrand = (string)hspElement.Element(ns + "query-strand");
+            QueryFrame = (string)hspElement.Element(ns + "query-frame");
             HitFrom = (int)hspElement.Element(ns + "hit-from");
             HitTo = (int)hspElement.Element(ns + "hit-to");
             HitStrand = (string)hspElement.Element(ns + "hit-strand");
+            HitFrame = (string)hspElement.Element(ns + "hit-frame");
             AlignLength = (int)hspElement.Element(ns + "align-len");
             Gaps = (int)hspElement.Element(ns + "gaps");
             QuerySeq = (string)hspElement.Element(ns + "qseq");
             HitSeq = (string)hspElement.Element(ns + "hseq");
             Alignment = (string)hspElement.Element(ns + "midline");
+
+            if (QueryFrame != null && !QueryFrame.StartsWith("-"))
+                QueryFrame = "+" + QueryFrame;
+
+            if (HitFrame != null && !HitFrame.StartsWith("-"))
+                HitFrame = "+" + HitFrame;
 
             var sb = new StringBuilder(AlignLength + 10);
 
@@ -150,11 +158,15 @@ namespace LocalBlast
 
         public string QueryStrand { get; }
 
+        public string QueryFrame { get; }
+
         public int HitFrom { get; }
 
         public int HitTo { get; }
 
         public string HitStrand { get; }
+
+        public string HitFrame { get; }
 
         public int AlignLength { get; }
 
