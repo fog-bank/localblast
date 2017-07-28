@@ -433,7 +433,7 @@ namespace LocalBlast
 
             sb.Capacity = queryName.Length + seg.QuerySeq.Length + hitName.Length + seg.HitSeq.Length + 5;
 
-            sb.Append(">").AppendLine(queryName).AppendLine(seg.QuerySeq).Append(">").AppendLine(hitName).Append(seg.QuerySeq);
+            sb.Append(">").AppendLine(queryName).AppendLine(seg.QuerySeq).Append(">").AppendLine(hitName).Append(seg.HitSeq);
             Clipboard.SetText(sb.ToString());
         }
 
