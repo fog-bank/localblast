@@ -10,6 +10,9 @@ namespace LocalBlast
         private BlastnTask task;
         private int maxHsps = Settings.Default.BlastnMaxHsps;
         private int maxTargetSeqs = Settings.Default.BlastnMaxTargetSeqs;
+        private bool subranged;
+        private int rangeFrom;
+        private int rangeTo;
 
         public BlastnPage(MainViewModel owner)
             : base(owner)
@@ -96,6 +99,42 @@ namespace LocalBlast
             }
         }
 
+        public bool QuerySubranged
+        {
+            get => subranged;
+            set
+            {
+                subranged = value;
+                OnPropertyChanged();
+
+                if (value && QueryRangeFrom == 0 && QueryRangeTo == 0 && Query != null)
+                {
+                    QueryRangeFrom = 1;
+                    QueryRangeTo = Query.Length;
+                }
+            }
+        }
+
+        public int QueryRangeFrom
+        {
+            get => rangeFrom;
+            set
+            {
+                rangeFrom = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int QueryRangeTo
+        {
+            get => rangeTo;
+            set
+            {
+                rangeTo = value;
+                OnPropertyChanged();
+            }
+        }
+
         public override void Close(object parameter)
         {
             base.Close(parameter);
@@ -132,6 +171,9 @@ namespace LocalBlast
 
             arglist["max_hsps"] = MaxHitSegmentPairs.ToString(culture);
             arglist["max_target_seqs"] = MaxTargetSequences.ToString(culture);
+
+            if (QuerySubranged)
+                arglist["query_loc"] = QueryRangeFrom + "-" + QueryRangeTo;
         }
     }
 

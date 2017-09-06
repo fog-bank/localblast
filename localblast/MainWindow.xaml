@@ -225,6 +225,14 @@
 											<TextBlock VerticalAlignment="Center">Max matches in a query range (<Run FontStyle="Italic">-max_hsps</Run>):</TextBlock>
 											<TextBox Margin="4" MinWidth="100" Text="{Binding MaxHitSegmentPairs}" />
 										</StackPanel>
+										<StackPanel Margin="0,2" Orientation="Horizontal">
+											<CheckBox IsChecked="{Binding QuerySubranged}" VerticalAlignment="Center">
+												<TextBlock>Query subrange (<Run FontStyle="Italic">-query_loc</Run>):</TextBlock>
+											</CheckBox>
+											<TextBox Margin="4" MinWidth="100" IsEnabled="{Binding QuerySubranged}" Text="{Binding QueryRangeFrom}" />
+											<TextBlock VerticalAlignment="Center">-</TextBlock>
+											<TextBox Margin="4" MinWidth="100" IsEnabled="{Binding QuerySubranged}" Text="{Binding QueryRangeTo}" />
+										</StackPanel>
 									</StackPanel>
 								</Expander>
 							</StackPanel>
