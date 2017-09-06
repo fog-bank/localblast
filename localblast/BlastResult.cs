@@ -40,8 +40,8 @@ namespace LocalBlast
             }
             MaxBitScore = bitScore;
             MinEValue = minEValue;
-            QueryCover = (double)queryLoc.TotalLength / queryLength;
-            HitCover = (double)hitLoc.TotalLength / Length;
+            QueryCover = TruncateRatio(queryLoc.TotalLength, queryLength);
+            HitCover = TruncateRatio(hitLoc.TotalLength, Length);
             QueryFrom = queryLoc.From;
             QueryTo = queryLoc.To;
         }
@@ -72,6 +72,8 @@ namespace LocalBlast
         public int QueryFrom { get; }
 
         public int QueryTo { get; }
+
+        public static double TruncateRatio(int numerator, int denominator) => (numerator * 100 / denominator) / 100.0;
     }
 
     public class SegmentPair
@@ -185,7 +187,7 @@ namespace LocalBlast
 
         public int QueryWidth => QueryTo - QueryFrom + 1;
 
-        public double IdentityRatio => (double)Identity / AlignLength;
+        public double IdentityRatio => Hit.TruncateRatio(Identity, AlignLength);
 
         public int BitScoreLevel
         {

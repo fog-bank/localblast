@@ -47,6 +47,71 @@
 					ItemsSource="{Binding Tabs}" SelectedIndex="{Binding SelectedTabIndex}"
 					ItemTemplateSelector="{DynamicResource itemTemplates}" ContentTemplateSelector="{DynamicResource contentTemplates}">
 			<TabControl.Resources>
+				<Style x:Key="alignView" TargetType="ListBox">
+					<Setter Property="BorderThickness" Value="0" />
+					<Setter Property="HorizontalAlignment" Value="Left" />
+					<Setter Property="IsSynchronizedWithCurrentItem" Value="True" />
+					<Setter Property="ItemTemplate">
+						<Setter.Value>
+							<DataTemplate DataType="local:Hit">
+								<ItemsControl ItemsSource="{Binding Segments}">
+									<ItemsControl.Template>
+										<ControlTemplate TargetType="ItemsControl">
+											<Canvas Width="{Binding Parent.QueryLength}" Height="12">
+												<Line X1="{Binding QueryFrom}" X2="{Binding QueryTo}" Y1="6" Y2="6" Stroke="Gray" />
+												<Canvas IsItemsHost="True" />
+											</Canvas>
+										</ControlTemplate>
+									</ItemsControl.Template>
+									<ItemsControl.ItemContainerStyle>
+										<Style TargetType="ContentPresenter">
+											<Setter Property="Canvas.Left" Value="{Binding QueryFrom}" />
+											<Setter Property="Canvas.Top" Value="1" />
+											<Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}" />
+										</Style>
+									</ItemsControl.ItemContainerStyle>
+									<ItemsControl.ItemTemplate>
+										<DataTemplate DataType="local:SegmentPair">
+											<Rectangle Width="{Binding QueryWidth}" Height="10" Stroke="Black"
+													   Fill="{Binding BitScoreLevel, Converter={StaticResource bitScoreColor}}"
+													   ToolTipService.ShowDuration="60000" MouseEnter="SegmentOnMouseEnter">
+												<Rectangle.ToolTip>
+													<Grid MaxWidth="200">
+														<Grid.ColumnDefinitions>
+															<ColumnDefinition Width="Auto" />
+															<ColumnDefinition Width="Auto" />
+															<ColumnDefinition Width="Auto" MinWidth="10" />
+															<ColumnDefinition Width="Auto" />
+															<ColumnDefinition />
+														</Grid.ColumnDefinitions>
+														<Grid.RowDefinitions>
+															<RowDefinition Height="Auto" />
+															<RowDefinition Height="Auto" />
+															<RowDefinition Height="Auto" />
+															<RowDefinition Height="Auto" />
+														</Grid.RowDefinitions>
+														<TextBlock Grid.ColumnSpan="5" Text="{Binding Parent.Title}" TextTrimming="CharacterEllipsis" />
+														<TextBlock Grid.Row="1">Query</TextBlock>
+														<TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding QueryFrom}" />
+														<TextBlock Grid.Row="1" Grid.Column="2" Padding="4,0">..</TextBlock>
+														<TextBlock Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" Text="{Binding QueryTo}" />
+														<TextBlock Grid.Row="2" Margin="0,0,4,0">Subject</TextBlock>
+														<TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding HitFrom}" />
+														<TextBlock Grid.Row="2" Grid.Column="2" Padding="4,0">..</TextBlock>
+														<TextBlock Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" Text="{Binding HitTo}" />
+														<TextBlock Grid.Row="3">Identity</TextBlock>
+														<TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
+																   HorizontalAlignment="Right" Text="{Binding IdentityRatio, StringFormat=p0}" />
+													</Grid>
+												</Rectangle.ToolTip>
+											</Rectangle>
+										</DataTemplate>
+									</ItemsControl.ItemTemplate>
+								</ItemsControl>
+							</DataTemplate>
+						</Setter.Value>
+					</Setter>
+				</Style>
 				<DataTemplate x:Key="DefaultHeader" DataType="local:TabPage">
 					<StackPanel Orientation="Horizontal">
 						<Image Height="16" Margin="0,0,4,0" VerticalAlignment="Center">
@@ -242,75 +307,19 @@
 							<StackPanel Margin="4">
 								<TextBlock Style="{DynamicResource header}" Margin="0,4">Result</TextBlock>
 								<StackPanel Name="blastnResult" Margin="0,4" Orientation="Horizontal">
-									<TextBlock>Query length:</TextBlock>
+									<TextBlock VerticalAlignment="Center">Query length:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding QueryLength}" />
+									<Slider Width="100" Minimum="0.01" Maximum="1" LargeChange="0.1" SmallChange="0.01" VerticalAlignment="Center"
+											Value="{Binding ScaleX, ElementName=blastnViewTrans}" />
+									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding ScaleX, ElementName=blastnViewTrans, StringFormat=p0}" />
 								</StackPanel>
-								<ListBox Name="blastnGraphicSummary" ItemsSource="{Binding Hits}" HorizontalAlignment="Left"
-										 SelectedItem="{Binding SelectedHit}" IsSynchronizedWithCurrentItem="True">
-									<ListBox.ItemsPanel>
-										<ItemsPanelTemplate>
-											<VirtualizingStackPanel />
-										</ItemsPanelTemplate>
-									</ListBox.ItemsPanel>
-									<ListBox.ItemTemplate>
-										<DataTemplate DataType="local:Hit">
-											<ItemsControl ItemsSource="{Binding Segments}">
-												<ItemsControl.Template>
-													<ControlTemplate TargetType="ItemsControl">
-														<Canvas Width="{Binding Parent.QueryLength}" Height="12">
-															<Line X1="{Binding QueryFrom}" X2="{Binding QueryTo}" Y1="6" Y2="6" Stroke="Gray" />
-															<Canvas IsItemsHost="True" />
-														</Canvas>
-													</ControlTemplate>
-												</ItemsControl.Template>
-												<ItemsControl.ItemContainerStyle>
-													<Style TargetType="ContentPresenter">
-														<Setter Property="Canvas.Left" Value="{Binding QueryFrom}" />
-														<Setter Property="Canvas.Top" Value="1" />
-														<Setter Property="Canvas.ZIndex" Value="{Binding ZIndex}" />
-													</Style>
-												</ItemsControl.ItemContainerStyle>
-												<ItemsControl.ItemTemplate>
-													<DataTemplate DataType="local:SegmentPair">
-														<Rectangle Width="{Binding QueryWidth}" Height="10" Stroke="Black" 
-																   Fill="{Binding BitScoreLevel, Converter={StaticResource bitScoreColor}}"
-																   ToolTipService.ShowDuration="60000" MouseEnter="SegmentOnMouseEnter">
-															<Rectangle.ToolTip>
-																<Grid MaxWidth="200">
-																	<Grid.ColumnDefinitions>
-																		<ColumnDefinition Width="Auto" />
-																		<ColumnDefinition Width="Auto" />
-																		<ColumnDefinition Width="Auto" MinWidth="10" />
-																		<ColumnDefinition Width="Auto" />
-																		<ColumnDefinition />
-																	</Grid.ColumnDefinitions>
-																	<Grid.RowDefinitions>
-																		<RowDefinition Height="Auto" />
-																		<RowDefinition Height="Auto" />
-																		<RowDefinition Height="Auto" />
-																		<RowDefinition Height="Auto" />
-																	</Grid.RowDefinitions>
-																	<TextBlock Grid.ColumnSpan="5" Text="{Binding Parent.Title}" TextTrimming="CharacterEllipsis" />
-																	<TextBlock Grid.Row="1">Query</TextBlock>
-																	<TextBlock Grid.Row="1" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding QueryFrom}" />
-																	<TextBlock Grid.Row="1" Grid.Column="2" Padding="4,0">..</TextBlock>
-																	<TextBlock Grid.Row="1" Grid.Column="3" HorizontalAlignment="Right" Text="{Binding QueryTo}" />
-																	<TextBlock Grid.Row="2" Margin="0,0,4,0">Subject</TextBlock>
-																	<TextBlock Grid.Row="2" Grid.Column="1" HorizontalAlignment="Right" Text="{Binding HitFrom}" />
-																	<TextBlock Grid.Row="2" Grid.Column="2" Padding="4,0">..</TextBlock>
-																	<TextBlock Grid.Row="2" Grid.Column="3" HorizontalAlignment="Right" Text="{Binding HitTo}" />
-																	<TextBlock Grid.Row="3">Identity</TextBlock>
-																	<TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3" 
-																			   HorizontalAlignment="Right" Text="{Binding IdentityRatio, StringFormat=p0}" />
-																</Grid>
-															</Rectangle.ToolTip>
-														</Rectangle>
-													</DataTemplate>
-												</ItemsControl.ItemTemplate>
-											</ItemsControl>
-										</DataTemplate>
-									</ListBox.ItemTemplate>
-								</ListBox>
+								<Border Name="blastnGraphicSummary" BorderBrush="LightGray" BorderThickness="1" Padding="1" HorizontalAlignment="Left">
+									<ListBox Style="{StaticResource alignView}" ItemsSource="{Binding Hits}" SelectedItem="{Binding SelectedHit}">
+										<ListBox.LayoutTransform>
+											<ScaleTransform x:Name="blastnViewTrans" />
+										</ListBox.LayoutTransform>
+									</ListBox>
+								</Border>
 								<TextBlock Margin="0,4" Text="{Binding Message}" />
 							</StackPanel>
 						</ScrollViewer>
