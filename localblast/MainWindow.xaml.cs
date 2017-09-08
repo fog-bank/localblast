@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using System.Windows.Shapes;
 
 namespace LocalBlast
 {
@@ -43,8 +42,8 @@ namespace LocalBlast
 
         private void SegmentOnMouseEnter(object sender, MouseEventArgs e)
         {
-            var rect = sender as Rectangle;
-            var segment = rect.DataContext as SegmentPair;
+            var element = sender as FrameworkElement;
+            var segment = element.DataContext as SegmentPair;
             (segment.Parent.Parent as BlastPage).SelectedSegment = segment;
 
         }

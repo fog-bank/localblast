@@ -15,6 +15,7 @@
 			<SolidColorBrush Color="Magenta" />
 			<SolidColorBrush Color="Red" />
 		</AlternationConverter>
+		<BooleanToVisibilityConverter x:Key="bool2visible" />
 		<Style TargetType="Button">
 			<Setter Property="Padding" Value="4,2" />
 			<Setter Property="VerticalAlignment" Value="Center" />
@@ -72,10 +73,11 @@
 									</ItemsControl.ItemContainerStyle>
 									<ItemsControl.ItemTemplate>
 										<DataTemplate DataType="local:SegmentPair">
-											<Rectangle Width="{Binding QueryWidth}" Height="10" Stroke="Black"
-													   Fill="{Binding BitScoreLevel, Converter={StaticResource bitScoreColor}}"
-													   ToolTipService.ShowDuration="60000" MouseEnter="SegmentOnMouseEnter">
-												<Rectangle.ToolTip>
+											<Border Width="{Binding QueryWidth}" Height="10" Visibility="{Binding IsVisible, Converter={StaticResource bool2visible}}"
+													BorderBrush="Black" BorderThickness="{Binding Parent.Parent.ZoomedThickness}"
+													Background="{Binding BitScoreLevel, Converter={StaticResource bitScoreColor}}"
+													ToolTipService.ShowDuration="60000" MouseEnter="SegmentOnMouseEnter">
+												<Border.ToolTip>
 													<Grid MaxWidth="200">
 														<Grid.ColumnDefinitions>
 															<ColumnDefinition Width="Auto" />
@@ -103,12 +105,19 @@
 														<TextBlock Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="3"
 																   HorizontalAlignment="Right" Text="{Binding IdentityRatio, StringFormat=p0}" />
 													</Grid>
-												</Rectangle.ToolTip>
-											</Rectangle>
+												</Border.ToolTip>
+											</Border>
 										</DataTemplate>
 									</ItemsControl.ItemTemplate>
 								</ItemsControl>
 							</DataTemplate>
+						</Setter.Value>
+					</Setter>
+					<Setter Property="ItemContainerStyle">
+						<Setter.Value>
+							<Style TargetType="ListBoxItem">
+								<Setter Property="BorderThickness" Value="{Binding Parent.ZoomedThickness}" />
+							</Style>
 						</Setter.Value>
 					</Setter>
 				</Style>
@@ -303,26 +312,42 @@
 							</StackPanel>
 						</ScrollViewer>
 						<GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
-						<ScrollViewer Grid.Row="3" HorizontalScrollBarVisibility="Auto">
-							<StackPanel Margin="4">
-								<TextBlock Style="{DynamicResource header}" Margin="0,4">Result</TextBlock>
-								<StackPanel Name="blastnResult" Margin="0,4" Orientation="Horizontal">
-									<TextBlock VerticalAlignment="Center">Query length:</TextBlock>
-									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding QueryLength}" />
-									<Slider Width="100" Minimum="0.01" Maximum="1" LargeChange="0.1" SmallChange="0.01" VerticalAlignment="Center"
-											Value="{Binding ScaleX, ElementName=blastnViewTrans}" />
-									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding ScaleX, ElementName=blastnViewTrans, StringFormat=p0}" />
-								</StackPanel>
+						<Grid Grid.Row="3" Margin="4">
+							<Grid.RowDefinitions>
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+								<RowDefinition Height="Auto" />
+								<RowDefinition />
+							</Grid.RowDefinitions>
+							<TextBlock Style="{DynamicResource header}" Margin="0,4">Result</TextBlock>
+							<StackPanel Name="blastnResult" Grid.Row="1" Margin="0,4" Orientation="Horizontal">
+								<TextBlock VerticalAlignment="Center">Query length:</TextBlock>
+								<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding QueryLength}" />
+								<Slider Width="100" VerticalAlignment="Center" 
+										Minimum="0.01" Maximum="1" LargeChange="0.1" SmallChange="0.01" Value="{Binding ZoomLevel}" />
+								<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding ZoomLevel, Mode=OneWay, StringFormat=p0}" />
+							</StackPanel>
+							<TextBlock Grid.Row="2" Margin="0,4" Text="{Binding Message}">
+								<TextBlock.Style>
+									<Style TargetType="TextBlock">
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding Message}" Value="{x:Null}">
+												<Setter Property="Visibility" Value="Collapsed" />
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</TextBlock.Style>
+							</TextBlock>
+							<ScrollViewer Grid.Row="3" Margin="-4,0" Padding="4" HorizontalScrollBarVisibility="Auto">
 								<Border Name="blastnGraphicSummary" BorderBrush="LightGray" BorderThickness="1" Padding="1" HorizontalAlignment="Left">
 									<ListBox Style="{StaticResource alignView}" ItemsSource="{Binding Hits}" SelectedItem="{Binding SelectedHit}">
 										<ListBox.LayoutTransform>
-											<ScaleTransform x:Name="blastnViewTrans" />
+											<ScaleTransform ScaleX="{Binding ZoomLevel}" />
 										</ListBox.LayoutTransform>
 									</ListBox>
 								</Border>
-								<TextBlock Margin="0,4" Text="{Binding Message}" />
-							</StackPanel>
-						</ScrollViewer>
+							</ScrollViewer>
+						</Grid>
 						<GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
 						<ScrollViewer Grid.Row="5" HorizontalScrollBarVisibility="Auto">
 							<StackPanel Name="blastnDescription" Margin="4">

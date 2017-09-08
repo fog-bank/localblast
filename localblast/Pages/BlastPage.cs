@@ -29,6 +29,7 @@ namespace LocalBlast
         private List<Hit> hits = new List<Hit>();
         private Hit selectedHit;
         private SegmentPair selectedSegment;
+        private double zoomLevel = 1;
 
         protected BlastPage(MainViewModel owner)
             : base(owner)
@@ -198,6 +199,22 @@ namespace LocalBlast
                 }
             }
         }
+
+        public double ZoomLevel
+        {
+            get => zoomLevel;
+            set
+            {
+                if (value <= 0)
+                    throw new ArgumentOutOfRangeException(nameof(value));
+
+                zoomLevel = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(ZoomedThickness));
+            }
+        }
+
+        public Thickness ZoomedThickness => new Thickness(1 / ZoomLevel, 1, 1 / ZoomLevel, 1);
 
         public void LoadSequence(object parameter)
         {

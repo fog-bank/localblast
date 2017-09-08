@@ -32,7 +32,12 @@ namespace LocalBlast
                 var value = new SegmentPair(this, hsp, ns);
                 Segments.Add(value);
 
-                queryLoc.UnionWith(new Span(value.QueryFrom, value.QueryTo));
+                var querySpan = new Span(value.QueryFrom, value.QueryTo);
+
+                if (!queryLoc.IsSupersetOf(querySpan))
+                    value.IsVisible = true;
+
+                queryLoc.UnionWith(querySpan);
                 hitLoc.UnionWith(new Span(value.HitFrom, value.HitTo));
 
                 bitScore = Math.Max(bitScore, value.BitScore);
@@ -208,5 +213,7 @@ namespace LocalBlast
                 return 4;
             }
         }
+
+        public bool IsVisible { get; set; }
     }
 }
