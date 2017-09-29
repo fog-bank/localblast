@@ -78,7 +78,7 @@ namespace LocalBlast
 
         public int QueryTo { get; }
 
-        public static double TruncateRatio(int numerator, int denominator) => (numerator * 100 / denominator) / 100.0;
+        public static double TruncateRatio(long numerator, long denominator) => (numerator * 100 / denominator) / 100.0;
     }
 
     public class SegmentPair
