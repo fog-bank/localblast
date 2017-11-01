@@ -218,8 +218,10 @@ namespace LocalBlast
 
         public void LoadSequence(object parameter)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Filter = "Alignment file(*.fa*)|*.fa*";
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Alignment file(*.fa*)|*.fa*"
+            };
 
             if (dlg.ShowDialog() == true)
             {
@@ -267,11 +269,13 @@ namespace LocalBlast
 
             File.WriteAllText(queryPath, ">" + JobTitle + Environment.NewLine + Query);
 
-            var arglist = new Dictionary<string, string>();
-            arglist["db"] = "\"" + DbPath + "\"";
-            arglist["query"] = "\"" + queryPath + "\"";
-            arglist["out"] = "\"" + outPath + "\"";
-            arglist["outfmt"] = "16";
+            var arglist = new Dictionary<string, string>
+            {
+                ["db"] = "\"" + DbPath + "\"",
+                ["query"] = "\"" + queryPath + "\"",
+                ["out"] = "\"" + outPath + "\"",
+                ["outfmt"] = "16"
+            };
 
             SetArgument(arglist);
 
@@ -282,9 +286,11 @@ namespace LocalBlast
 
             sb.Length--;
 
-            var psi = new ProcessStartInfo(ExePath);
-            psi.Arguments = sb.ToString();
-            psi.WindowStyle = ProcessWindowStyle.Hidden;
+            var psi = new ProcessStartInfo(ExePath)
+            {
+                Arguments = sb.ToString(),
+                WindowStyle = ProcessWindowStyle.Hidden
+            };
 
             using (cts = new CancellationTokenSource())
             {

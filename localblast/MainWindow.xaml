@@ -429,6 +429,7 @@
 										</Button>
 									</ToolBar>
 									<Button Margin="4" Command="{Binding CopyAlignmentCommand}">Copy alignment</Button>
+									<CheckBox Margin="4" VerticalAlignment="Center" IsChecked="{Binding SelectedSegment.IsVisible, Mode=OneWay}" IsEnabled="False">Visible</CheckBox>
 								</StackPanel>
 								<StackPanel Margin="0,2" Orientation="Horizontal">
 									<TextBlock>Bit score:</TextBlock>
@@ -755,7 +756,14 @@
 									<TextBlock>Database:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
 								</StackPanel>
-								<Expander Header="Parameters" Margin="0,4" />
+								<Expander Header="Parameters" Margin="0,4">
+									<StackPanel>
+										<StackPanel Margin="0,2" Orientation="Horizontal">
+											<TextBlock VerticalAlignment="Center">Max target sequences (<Run FontStyle="Italic">-max_target_seqs</Run>):</TextBlock>
+											<TextBox Margin="4" MinWidth="100" Text="{Binding MaxTargetSequences}" />
+										</StackPanel>
+									</StackPanel>
+								</Expander>
 							</StackPanel>
 						</ScrollViewer>
 						<GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
