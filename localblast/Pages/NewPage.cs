@@ -121,7 +121,7 @@ namespace LocalBlast
         public void BrowseBlastnDb(object parameter)
         {
             var dlg = new OpenFileDialog();
-            dlg.Filter = "blastn sequence file (*.nsq)|*.nsq";
+            dlg.Filter = "Nucleotide sequence file (*.nsq;*.nsl)|*.nsq;*.nsl";
 
             if (dlg.ShowDialog() == true)
             {
@@ -159,9 +159,9 @@ namespace LocalBlast
         public void BrowseBlastpDb(object parameter)
 		{
 			var dlg = new OpenFileDialog();
-			dlg.Filter = "blastp sequence file (*.psq)|*.psq";
+            dlg.Filter = "Protein sequence file (*.psq;*.psl)|*.psq;*.psl";
 
-			if (dlg.ShowDialog() == true)
+            if (dlg.ShowDialog() == true)
 			{
 				BlastpDbPath = dlg.FileName;
 				OpenBlastpCommand.OnCanExecuteChanged();
@@ -197,7 +197,7 @@ namespace LocalBlast
         public void BrowseBlastxDb(object parameter)
         {
             var dlg = new OpenFileDialog();
-            dlg.Filter = "blastp sequence file (*.psq)|*.psq";
+            dlg.Filter = "Protein sequence file (*.psq;*.psl)|*.psq;*.psl";
 
             if (dlg.ShowDialog() == true)
             {
