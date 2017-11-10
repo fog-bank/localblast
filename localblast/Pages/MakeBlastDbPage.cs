@@ -145,7 +145,8 @@ namespace LocalBlast
                 { }
 
                 if (cts != null && !cts.IsCancellationRequested && task.IsCompleted && task.Result == 0 && 
-                    File.Exists(Output + (DbType == MakeBlastDbType.Protein ? ".psq" : ".nsq")))
+                    (File.Exists(Output + (DbType == MakeBlastDbType.Protein ? ".psq" : ".nsq")) 
+                    || File.Exists(Output + (DbType == MakeBlastDbType.Protein ? ".pal" : ".nal"))))
                 {
                     State = PageState.Completed;
                 }

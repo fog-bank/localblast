@@ -121,7 +121,7 @@ namespace LocalBlast
         public void BrowseBlastnDb(object parameter)
         {
             var dlg = new OpenFileDialog();
-            dlg.Filter = "Nucleotide sequence file (*.nsq;*.nsl)|*.nsq;*.nsl";
+            dlg.Filter = "Nucleotide sequence file (*.nsq;*.nal)|*.nsq;*.nal";
 
             if (dlg.ShowDialog() == true)
             {
@@ -159,7 +159,7 @@ namespace LocalBlast
         public void BrowseBlastpDb(object parameter)
 		{
 			var dlg = new OpenFileDialog();
-            dlg.Filter = "Protein sequence file (*.psq;*.psl)|*.psq;*.psl";
+            dlg.Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal";
 
             if (dlg.ShowDialog() == true)
 			{
@@ -197,7 +197,7 @@ namespace LocalBlast
         public void BrowseBlastxDb(object parameter)
         {
             var dlg = new OpenFileDialog();
-            dlg.Filter = "Protein sequence file (*.psq;*.psl)|*.psq;*.psl";
+            dlg.Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal";
 
             if (dlg.ShowDialog() == true)
             {
