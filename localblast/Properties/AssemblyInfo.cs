@@ -8,7 +8,7 @@ using System.Windows;
 [assembly: AssemblyTitle("Local BLAST Runner")]
 [assembly: AssemblyCompany("co3366353")]
 [assembly: AssemblyProduct("localblast")]
-[assembly: AssemblyCopyright("Copyright © 2017 fog-bank. Some rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2018 fog-bank. Some rights reserved.")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -46,4 +46,4 @@ using System.Windows;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("0.2.0.0")]
-[assembly: AssemblyFileVersion("0.2.11110.12")]
+[assembly: AssemblyFileVersion("0.2.20216.13")]

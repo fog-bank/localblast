@@ -261,54 +261,67 @@
 							<RowDefinition Height="Auto" />
 							<RowDefinition Height="{Binding DescPaneHeight, Mode=TwoWay}" MinHeight="50" />
 						</Grid.RowDefinitions>
-						<StackPanel Margin="4,4,4,8" Orientation="Horizontal">
-							<Button Command="{Binding RunCommand}">Run</Button>
-							<Button Margin="8,0" Command="{Binding CancelCommand}">Cancel</Button>
+						<StackPanel Margin="4" Orientation="Horizontal">
+							<Button Command="{Binding LoadSequenceCommand}">Load a sequence and Run</Button>
+							<Button Margin="8,0" Command="{Binding RunCommand}">Run</Button>
+							<Button Command="{Binding CancelCommand}">Cancel</Button>
 						</StackPanel>
 						<ScrollViewer Grid.Row="1">
 							<StackPanel Margin="4">
-								<CheckBox HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
-								<StackPanel Margin="0,8" Orientation="Horizontal">
-									<TextBlock>Job ID:</TextBlock>
-									<TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
-								</StackPanel>
-								<TextBlock>Job title</TextBlock>
-								<TextBox Margin="0,4" Padding="2" Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}" />
-								<StackPanel Orientation="Horizontal">
-									<TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
-									<Button Margin="8,0" Command="{Binding LoadSequenceCommand}">Load a sequence and Run</Button>
-								</StackPanel>
-								<TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
-										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+								<Grid Margin="0,4">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition />
+									</Grid.ColumnDefinitions>
+									<TextBlock VerticalAlignment="Center">Job title</TextBlock>
+									<TextBox Grid.Column="1" Margin="8,0" Padding="2" Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}" />
+								</Grid>
 								<StackPanel Margin="0,4" Orientation="Horizontal">
 									<TextBlock>Database:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
 								</StackPanel>
 								<Expander Header="Parameters" Margin="0,4">
-									<StackPanel>
-										<StackPanel Margin="0,2" Orientation="Horizontal">
+									<StackPanel Margin="8,0,0,0">
+										<StackPanel Margin="0,4" Orientation="Horizontal">
 											<TextBlock VerticalAlignment="Center">BLAST algorithm (<Run FontStyle="Italic">-task</Run>):</TextBlock>
-											<ComboBox Margin="4" MinWidth="100" HorizontalAlignment="Left" 
+											<ComboBox Margin="4,0" MinWidth="100" HorizontalAlignment="Left" 
 													  ItemsSource="{Binding Tasks, Mode=OneTime}" SelectedItem="{Binding Task}" />
 										</StackPanel>
-										<StackPanel Margin="0,2" Orientation="Horizontal">
+										<StackPanel Margin="0,4" Orientation="Horizontal">
+											<TextBlock VerticalAlignment="Center">Expectation value threshold for saving hits (<Run FontStyle="Italic">-evalue</Run>):</TextBlock>
+											<TextBox Margin="4,0" MinWidth="100" Text="{Binding Evalue}" />
+										</StackPanel>
+										<StackPanel Margin="0,4" Orientation="Horizontal">
 											<TextBlock VerticalAlignment="Center">Max target sequences (<Run FontStyle="Italic">-max_target_seqs</Run>):</TextBlock>
-											<TextBox Margin="4" MinWidth="100" Text="{Binding MaxTargetSequences}" />
+											<TextBox Margin="4,0" MinWidth="100" Text="{Binding MaxTargetSequences}" />
 										</StackPanel>
-										<StackPanel Margin="0,2" Orientation="Horizontal">
+										<StackPanel Margin="0,4" Orientation="Horizontal">
 											<TextBlock VerticalAlignment="Center">Max matches in a query range (<Run FontStyle="Italic">-max_hsps</Run>):</TextBlock>
-											<TextBox Margin="4" MinWidth="100" Text="{Binding MaxHitSegmentPairs}" />
+											<TextBox Margin="4,0" MinWidth="100" Text="{Binding MaxHitSegmentPairs}" />
 										</StackPanel>
-										<StackPanel Margin="0,2" Orientation="Horizontal">
+										<StackPanel Margin="0,4" Orientation="Horizontal">
+											<CheckBox IsChecked="{Binding QueryFilterWithDust}" VerticalAlignment="Center">
+												<TextBlock>Filter query sequence with Dust (<Run FontStyle="Italic">-dust</Run>)</TextBlock>
+											</CheckBox>
+										</StackPanel>
+										<StackPanel Margin="0,4" Orientation="Horizontal">
 											<CheckBox IsChecked="{Binding QuerySubranged}" VerticalAlignment="Center">
 												<TextBlock>Query subrange (<Run FontStyle="Italic">-query_loc</Run>):</TextBlock>
 											</CheckBox>
-											<TextBox Margin="4" MinWidth="100" IsEnabled="{Binding QuerySubranged}" Text="{Binding QueryRangeFrom}" />
+											<TextBox Margin="4,0" MinWidth="100" IsEnabled="{Binding QuerySubranged}" Text="{Binding QueryRangeFrom}" />
 											<TextBlock VerticalAlignment="Center">-</TextBlock>
-											<TextBox Margin="4" MinWidth="100" IsEnabled="{Binding QuerySubranged}" Text="{Binding QueryRangeTo}" />
+											<TextBox Margin="4,0" MinWidth="100" IsEnabled="{Binding QuerySubranged}" Text="{Binding QueryRangeTo}" />
 										</StackPanel>
 									</StackPanel>
 								</Expander>
+								<TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
+								<TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
+										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+								<StackPanel Margin="0,4" Orientation="Horizontal">
+									<TextBlock>Job ID:</TextBlock>
+									<TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
+								</StackPanel>
+								<CheckBox Margin="0,4" HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
 							</StackPanel>
 						</ScrollViewer>
 						<GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
@@ -492,29 +505,33 @@
 							<RowDefinition Height="{Binding DescPaneHeight, Mode=TwoWay}" MinHeight="50" />
 						</Grid.RowDefinitions>
 						<StackPanel Margin="4,4,4,8" Orientation="Horizontal">
-							<Button Command="{Binding RunCommand}">Run</Button>
-							<Button Margin="8,0" Command="{Binding CancelCommand}">Cancel</Button>
+							<Button Command="{Binding LoadSequenceCommand}">Load a sequence and Run</Button>
+							<Button Margin="8,0" Command="{Binding RunCommand}">Run</Button>
+							<Button Command="{Binding CancelCommand}">Cancel</Button>
 						</StackPanel>
 						<ScrollViewer Grid.Row="1">
 							<StackPanel Margin="4">
-								<CheckBox HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
-								<StackPanel Margin="0,8" Orientation="Horizontal">
-									<TextBlock>Job ID:</TextBlock>
-									<TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
-								</StackPanel>
-								<TextBlock>Job title</TextBlock>
-								<TextBox Margin="0,4" Padding="2" Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}" />
-								<StackPanel Orientation="Horizontal">
-									<TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
-									<Button Margin="8,0" Command="{Binding LoadSequenceCommand}">Load a sequence and Run</Button>
-								</StackPanel>
-								<TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
-										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+								<Grid Margin="0,4">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition />
+									</Grid.ColumnDefinitions>
+									<TextBlock VerticalAlignment="Center">Job title</TextBlock>
+									<TextBox Grid.Column="1" Margin="8,0" Padding="2" Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}" />
+								</Grid>
 								<StackPanel Margin="0,4" Orientation="Horizontal">
 									<TextBlock>Database:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
 								</StackPanel>
-								<Expander Header="Parameters" Margin="0,4" />
+								<!--<Expander Header="Parameters" Margin="0,4" />-->
+								<TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
+								<TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
+										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+								<StackPanel Margin="0,4" Orientation="Horizontal">
+									<TextBlock>Job ID:</TextBlock>
+									<TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
+								</StackPanel>
+								<CheckBox Margin="0,4" HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
 							</StackPanel>
 						</ScrollViewer>
 						<GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
@@ -734,36 +751,40 @@
 							<RowDefinition Height="{Binding DescPaneHeight, Mode=TwoWay}" MinHeight="50" />
 						</Grid.RowDefinitions>
 						<StackPanel Margin="4,4,4,8" Orientation="Horizontal">
-							<Button Command="{Binding RunCommand}">Run</Button>
-							<Button Margin="8,0" Command="{Binding CancelCommand}">Cancel</Button>
+							<Button Command="{Binding LoadSequenceCommand}">Load a sequence and Run</Button>
+							<Button Margin="8,0" Command="{Binding RunCommand}">Run</Button>
+							<Button Command="{Binding CancelCommand}">Cancel</Button>
 						</StackPanel>
 						<ScrollViewer Grid.Row="1">
 							<StackPanel Margin="4">
-								<CheckBox HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
-								<StackPanel Margin="0,8" Orientation="Horizontal">
-									<TextBlock>Job ID:</TextBlock>
-									<TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
-								</StackPanel>
-								<TextBlock>Job title</TextBlock>
-								<TextBox Margin="0,4" Padding="2" Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}" />
-								<StackPanel Orientation="Horizontal">
-									<TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
-									<Button Margin="8,0" Command="{Binding LoadSequenceCommand}">Load a sequence and Run</Button>
-								</StackPanel>
-								<TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
-										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+								<Grid Margin="0,4">
+									<Grid.ColumnDefinitions>
+										<ColumnDefinition Width="Auto" />
+										<ColumnDefinition />
+									</Grid.ColumnDefinitions>
+									<TextBlock VerticalAlignment="Center">Job title</TextBlock>
+									<TextBox Grid.Column="1" Margin="8,0" Padding="2" Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}" />
+								</Grid>
 								<StackPanel Margin="0,4" Orientation="Horizontal">
 									<TextBlock>Database:</TextBlock>
 									<TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
 								</StackPanel>
 								<Expander Header="Parameters" Margin="0,4">
-									<StackPanel>
-										<StackPanel Margin="0,2" Orientation="Horizontal">
+									<StackPanel Margin="8,0,0,0">
+										<StackPanel Margin="0,4" Orientation="Horizontal">
 											<TextBlock VerticalAlignment="Center">Max target sequences (<Run FontStyle="Italic">-max_target_seqs</Run>):</TextBlock>
-											<TextBox Margin="4" MinWidth="100" Text="{Binding MaxTargetSequences}" />
+											<TextBox Margin="4,0" MinWidth="100" Text="{Binding MaxTargetSequences}" />
 										</StackPanel>
 									</StackPanel>
 								</Expander>
+								<TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
+								<TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
+										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+								<StackPanel Margin="0,4" Orientation="Horizontal">
+									<TextBlock>Job ID:</TextBlock>
+									<TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
+								</StackPanel>
+								<CheckBox Margin="0,4" HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
 							</StackPanel>
 						</ScrollViewer>
 						<GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />

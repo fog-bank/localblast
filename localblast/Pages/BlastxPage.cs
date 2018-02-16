@@ -17,7 +17,7 @@ namespace LocalBlast
 
         public string QueryPaneHeight
         {
-            get { return Settings.Default.BlastxQueryPaneHeight; }
+            get => Settings.Default.BlastxQueryPaneHeight;
             set
             {
                 Settings.Default.BlastxQueryPaneHeight = value;
@@ -27,7 +27,7 @@ namespace LocalBlast
 
         public string ResultPaneHeight
         {
-            get { return Settings.Default.BlastxResultPaneHeight; }
+            get => Settings.Default.BlastxResultPaneHeight;
             set
             {
                 Settings.Default.BlastxResultPaneHeight = value;
@@ -37,7 +37,7 @@ namespace LocalBlast
 
         public string DescPaneHeight
         {
-            get { return Settings.Default.BlastxDescPaneHeight; }
+            get => Settings.Default.BlastxDescPaneHeight;
             set
             {
                 Settings.Default.BlastxDescPaneHeight = value;

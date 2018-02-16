@@ -56,7 +56,7 @@ namespace LocalBlast
 
         public string BlastnDbPath
         {
-            get { return blastnDatabasePath; }
+            get => blastnDatabasePath;
             set
             {
                 blastnDatabasePath = value;
@@ -66,19 +66,19 @@ namespace LocalBlast
         }
 
         public string BlastpDbPath
-		{
-			get { return blastpDatabasePath; }
-			set
-			{
-				blastpDatabasePath = value;
-				Settings.Default.BlastpDbPath = value;
-				OnPropertyChanged();
-			}
+        {
+            get => blastpDatabasePath;
+            set
+            {
+                blastpDatabasePath = value;
+                Settings.Default.BlastpDbPath = value;
+                OnPropertyChanged();
+            }
         }
 
         public string BlastxDbPath
         {
-            get { return blastxDatabasePath; }
+            get => blastxDatabasePath;
             set
             {
                 blastxDatabasePath = value;
@@ -121,7 +121,7 @@ namespace LocalBlast
         public void BrowseBlastnDb(object parameter)
         {
             var dlg = new OpenFileDialog();
-            dlg.Filter = "Nucleotide sequence file (*.nsq;*.nal)|*.nsq;*.nal";
+            dlg.Filter = BlastnPage.DbFileTypeFilter;
 
             if (dlg.ShowDialog() == true)
             {

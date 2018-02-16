@@ -6,10 +6,14 @@ namespace LocalBlast
 {
     public class BlastnPage : BlastPage
     {
+        public const string DbFileTypeFilter = "Nucleotide sequence file (*.nsq;*.nal)|*.nsq;*.nal";
+
         private static int index = 1;
         private BlastnTask task;
+        private double evalue = Settings.Default.BlastnEvalue;
         private int maxHsps = Settings.Default.BlastnMaxHsps;
         private int maxTargetSeqs = Settings.Default.BlastnMaxTargetSeqs;
+        private bool dust = Settings.Default.BlastnDust;
         private bool subranged;
         private int rangeFrom;
         private int rangeTo;
@@ -24,7 +28,7 @@ namespace LocalBlast
 
         public string QueryPaneHeight
         {
-            get { return Settings.Default.BlastnQueryPaneHeight; }
+            get => Settings.Default.BlastnQueryPaneHeight;
             set
             {
                 Settings.Default.BlastnQueryPaneHeight = value;
@@ -34,7 +38,7 @@ namespace LocalBlast
 
         public string ResultPaneHeight
         {
-            get { return Settings.Default.BlastnResultPaneHeight; }
+            get => Settings.Default.BlastnResultPaneHeight;
             set
             {
                 Settings.Default.BlastnResultPaneHeight = value;
@@ -44,7 +48,7 @@ namespace LocalBlast
 
         public string DescPaneHeight
         {
-            get { return Settings.Default.BlastnDescPaneHeight; }
+            get => Settings.Default.BlastnDescPaneHeight;
             set
             {
                 Settings.Default.BlastnDescPaneHeight = value;
@@ -63,6 +67,22 @@ namespace LocalBlast
             set
             {
                 task = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the expectation value threshold for saving hits.
+        /// </summary>
+        public double Evalue
+        {
+            get => evalue;
+            set
+            {
+                if (value < 0)
+                    throw new ArgumentOutOfRangeException(nameof(value));
+
+                evalue = value;
                 OnPropertyChanged();
             }
         }
@@ -95,6 +115,19 @@ namespace LocalBlast
                     throw new ArgumentOutOfRangeException(nameof(value));
 
                 maxTargetSeqs = value;
+                OnPropertyChanged();
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets whether filtering query sequence with DUST
+        /// </summary>
+        public bool QueryFilterWithDust
+        {
+            get => dust;
+            set
+            {
+                dust = value;
                 OnPropertyChanged();
             }
         }
@@ -140,8 +173,10 @@ namespace LocalBlast
             base.Close(parameter);
 
             Settings.Default.BlastnTask = Task.ToString();
+            Settings.Default.BlastnEvalue = Evalue;
             Settings.Default.BlastnMaxHsps = MaxHitSegmentPairs;
             Settings.Default.BlastnMaxTargetSeqs = MaxTargetSequences;
+            Settings.Default.BlastnDust = QueryFilterWithDust;
         }
 
         protected override void SetArgument(Dictionary<string, string> arglist)
@@ -169,11 +204,15 @@ namespace LocalBlast
                     break;
             }
 
+            arglist["evalue"] = evalue.ToString(culture);
             arglist["max_hsps"] = MaxHitSegmentPairs.ToString(culture);
             arglist["max_target_seqs"] = MaxTargetSequences.ToString(culture);
 
+            if (!dust)
+                arglist["dust"] = "no";
+
             if (QuerySubranged)
-                arglist["query_loc"] = QueryRangeFrom + "-" + QueryRangeTo;
+                arglist["query_loc"] = QueryRangeFrom.ToString(culture) + "-" + QueryRangeTo.ToString(culture);
         }
     }
 

@@ -12,7 +12,7 @@
 
         public string QueryPaneHeight
         {
-            get { return Settings.Default.BlastpQueryPaneHeight; }
+            get => Settings.Default.BlastpQueryPaneHeight;
             set
             {
                 Settings.Default.BlastpQueryPaneHeight = value;
@@ -22,7 +22,7 @@
 
         public string ResultPaneHeight
         {
-            get { return Settings.Default.BlastpResultPaneHeight; }
+            get => Settings.Default.BlastpResultPaneHeight;
             set
             {
                 Settings.Default.BlastpResultPaneHeight = value;
@@ -32,7 +32,7 @@
 
         public string DescPaneHeight
         {
-            get { return Settings.Default.BlastpDescPaneHeight; }
+            get => Settings.Default.BlastpDescPaneHeight;
             set
             {
                 Settings.Default.BlastpDescPaneHeight = value;

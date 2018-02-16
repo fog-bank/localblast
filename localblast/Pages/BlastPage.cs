@@ -59,7 +59,7 @@ namespace LocalBlast
 
         public string ExePath
         {
-            get { return exePath; }
+            get => exePath;
             set
             {
                 exePath = value;
@@ -69,7 +69,7 @@ namespace LocalBlast
 
         public string DbPath
         {
-            get { return dbPath; }
+            get => dbPath;
             set
             {
                 dbPath = value;
@@ -79,7 +79,7 @@ namespace LocalBlast
 
         public string Query
         {
-            get { return query; }
+            get => query;
             set
             {
                 if (value != null && value.StartsWith(">"))
@@ -100,7 +100,7 @@ namespace LocalBlast
 
         public string JobTitle
         {
-            get { return jobTitle; }
+            get => jobTitle;
             set
             {
                 jobTitle = value;
@@ -112,7 +112,7 @@ namespace LocalBlast
 
         public string JobID
         {
-            get { return jobId; }
+            get => jobId;
             set
             {
                 jobId = value;
@@ -122,7 +122,7 @@ namespace LocalBlast
 
         public bool EnableCleanup
         {
-            get { return cleanup; }
+            get => cleanup;
             set
             {
                 cleanup = value;
@@ -132,7 +132,7 @@ namespace LocalBlast
 
         public int QueryLength
         {
-            get { return queryLength; }
+            get => queryLength;
             set
             {
                 queryLength = value;
@@ -142,7 +142,7 @@ namespace LocalBlast
 
         public string Message
         {
-            get { return message; }
+            get => message;
             set
             {
                 message = value;
@@ -152,7 +152,7 @@ namespace LocalBlast
 
         public List<Hit> Hits
         {
-            get { return hits; }
+            get => hits;
             set
             {
                 hits = value;
@@ -162,7 +162,7 @@ namespace LocalBlast
 
         public Hit SelectedHit
         {
-            get { return selectedHit; }
+            get => selectedHit;
             set
             {
                 if (selectedHit != value)
@@ -182,7 +182,7 @@ namespace LocalBlast
 
         public SegmentPair SelectedSegment
         {
-            get { return selectedSegment; }
+            get => selectedSegment;
             set
             {
                 if (selectedSegment != value)
