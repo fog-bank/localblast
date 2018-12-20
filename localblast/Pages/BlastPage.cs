@@ -100,10 +100,19 @@ namespace LocalBlast
                         if (index >= 2)
                             JobTitle = value.Substring(1, index).Trim();
 
-                        index = value.IndexOf("1\r\n", index + 1);
+                        // DNA
+                        int index2 = value.IndexOf("1\r\n", index + 1);
 
-                        if (index != -1)
-                            value = value.Substring(index + 3);
+                        if (index2 != -1)
+                            value = value.Substring(index2 + 3);
+                        else
+                        {
+                            // Protein
+                            index2 = value.IndexOf("0\r\n", index + 1);
+
+                            if (index2 != -1)
+                                value = value.Substring(index2 + 3);
+                        }
                     }
                 }
                 query = value;

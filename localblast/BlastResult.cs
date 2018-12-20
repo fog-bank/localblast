@@ -115,35 +115,48 @@ namespace LocalBlast
             var sb = new StringBuilder(AlignLength + 10);
 
             if (QuerySeq != null)
-            {
-                bool rev = QueryStrand == "Minus" || (QueryFrame != null && QueryFrame.StartsWith("-"));
-
-                for (int seqPos = 0, queryPos = rev ? QueryFrom + 1 : QueryFrom - 1; seqPos < QuerySeq.Length; seqPos++)
-                {
-                    if (QuerySeq[seqPos] != '-')
-                        queryPos += rev ? -1 : 1;
-
-                    if (sb.Length == seqPos)
-                        sb.Append(queryPos % 100 == 1 ? "|" + queryPos : " ");
-                }
-                QueryScaleMark = sb.ToString();
-                sb.Clear();
-            }
+                QueryScaleMark = CreateScaleMark(sb, QuerySeq, QueryFrom, QueryTo, QueryStrand, QueryFrame);
 
             if (HitSeq != null)
+                HitScaleMark = CreateScaleMark(sb, HitSeq, HitFrom, HitTo, HitStrand, HitFrame);
+
+            string CreateScaleMark(StringBuilder buffer, string alignment, int from, int to, string strand, string frame)
             {
-                bool rev = HitStrand == "Minus" || (HitFrame != null && HitFrame.StartsWith("-"));
+                buffer.Clear();
 
-                for (int seqPos = 0, hitPos = rev ? HitFrom + 1 : HitFrom - 1; seqPos < HitSeq.Length; seqPos++)
+                int incr = 1;
+                int seqPos = from - 1;
+
+                if (strand == "Minus")
                 {
-                    if (HitSeq[seqPos] != '-')
-                        hitPos += rev ? -1 : 1;
-
-                    if (sb.Length == seqPos)
-                        sb.Append(hitPos % 100 == 1 ? "|" + hitPos : " ");
+                    incr = -1;
+                    seqPos = from + 1;
                 }
-                HitScaleMark = sb.ToString();
-                sb.Clear();
+                else if (frame != null)
+                {
+                    int frameValue = int.Parse(frame);
+
+                    if (frame.StartsWith("+"))
+                    {
+                        incr = 3;
+                        seqPos = from - 3;
+                    }
+                    else
+                    {
+                        incr = -3;
+                        seqPos = to + 3;
+                    }
+                }
+
+                for (int alignPos = 0; alignPos < alignment.Length; alignPos++)
+                {
+                    if (alignment[alignPos] != '-')
+                        seqPos += incr;
+
+                    if (sb.Length == alignPos)
+                        buffer.Append(seqPos % 100 == 1 ? "|" + seqPos : " ");
+                }
+                return buffer.ToString();
             }
         }
 
