@@ -12,3 +12,4 @@
 * makeblastdb
 * blastn
 * blastp
+* blastx

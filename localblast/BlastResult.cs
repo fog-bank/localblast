@@ -116,10 +116,12 @@ namespace LocalBlast
 
             if (QuerySeq != null)
             {
-                for (int seqPos = 0, queryPos = QueryFrom - 1; seqPos < QuerySeq.Length; seqPos++)
+                bool rev = QueryStrand == "Minus" || (QueryFrame != null && QueryFrame.StartsWith("-"));
+
+                for (int seqPos = 0, queryPos = rev ? QueryFrom + 1 : QueryFrom - 1; seqPos < QuerySeq.Length; seqPos++)
                 {
                     if (QuerySeq[seqPos] != '-')
-                        queryPos++;
+                        queryPos += rev ? -1 : 1;
 
                     if (sb.Length == seqPos)
                         sb.Append(queryPos % 100 == 1 ? "|" + queryPos : " ");
@@ -130,10 +132,12 @@ namespace LocalBlast
 
             if (HitSeq != null)
             {
-                for (int seqPos = 0, hitPos = HitFrom - 1; seqPos < HitSeq.Length; seqPos++)
+                bool rev = HitStrand == "Minus" || (HitFrame != null && HitFrame.StartsWith("-"));
+
+                for (int seqPos = 0, hitPos = rev ? HitFrom + 1 : HitFrom - 1; seqPos < HitSeq.Length; seqPos++)
                 {
                     if (HitSeq[seqPos] != '-')
-                        hitPos++;
+                        hitPos += rev ? -1 : 1;
 
                     if (sb.Length == seqPos)
                         sb.Append(hitPos % 100 == 1 ? "|" + hitPos : " ");

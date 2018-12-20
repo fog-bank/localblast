@@ -82,14 +82,28 @@ namespace LocalBlast
             get => query;
             set
             {
-                if (value != null && value.StartsWith(">"))
+                if (value != null)
                 {
-                    int index = value.IndexOf('\n');
-
-                    if (index >= 2)
+                    if (value.StartsWith(">"))
                     {
-                        JobTitle = value.Substring(1, index).Trim();
+                        int index = value.IndexOf('\n');
+
+                        if (index >= 2)
+                            JobTitle = value.Substring(1, index).Trim();
+
                         value = value.Substring(index + 1);
+                    }
+                    else if (value.StartsWith("#"))
+                    {
+                        int index = value.IndexOf('\n');
+
+                        if (index >= 2)
+                            JobTitle = value.Substring(1, index).Trim();
+
+                        index = value.IndexOf("1\r\n", index + 1);
+
+                        if (index != -1)
+                            value = value.Substring(index + 3);
                     }
                 }
                 query = value;
@@ -347,7 +361,7 @@ namespace LocalBlast
             SelectedHit = Hits?.FirstOrDefault();
 
             if (SelectedHit == null)
-                Message = "Query length:  " + QueryLength + Environment.NewLine + Environment.NewLine + Message; 
+                Message = "Query length:  " + QueryLength + Environment.NewLine + Environment.NewLine + Message;
 
             running = false;
             RunCommand.OnCanExecuteChanged();
