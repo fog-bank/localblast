@@ -129,7 +129,7 @@ namespace LocalBlast
                 jobTitle = value;
                 OnPropertyChanged();
 
-                Header = JobTitle;
+                Header = JobTitle?.Split(' ')[0];
             }
         }
 
