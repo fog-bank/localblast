@@ -17,7 +17,6 @@ namespace LocalBlast
 
         private bool running;
         private CancellationTokenSource cts;
-        private ObservableCollection<string> stdout = new ObservableCollection<string>();
 
         public MakeBlastDbPage(MainViewModel owner)
             : base(owner)
@@ -40,7 +39,7 @@ namespace LocalBlast
 
         public string MakeBlastDbPath
         {
-            get { return path; }
+            get => path;
             set
             {
                 path = value;
@@ -50,7 +49,7 @@ namespace LocalBlast
 
         public string Input
         {
-            get { return input; }
+            get => input;
             set
             {
                 input = value;
@@ -65,7 +64,7 @@ namespace LocalBlast
 
         public string Output
         {
-            get { return output; }
+            get => output;
             set
             {
                 output = value;
@@ -77,7 +76,7 @@ namespace LocalBlast
 
         public MakeBlastDbType DbType
         {
-            get { return dbType; }
+            get => dbType;
             set
             {
                 dbType = value;
@@ -85,7 +84,7 @@ namespace LocalBlast
             }
         }
 
-        public ObservableCollection<string> StdOut => stdout;
+        public ObservableCollection<string> StdOut { get; } = new ObservableCollection<string>();
 
         public void BrowseInputFile(object parameter)
         {

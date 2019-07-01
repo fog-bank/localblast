@@ -123,6 +123,9 @@ namespace LocalBlast
             var dlg = new OpenFileDialog();
             dlg.Filter = BlastnPage.DbFileTypeFilter;
 
+            if (File.Exists(BlastnDbPath))
+                dlg.InitialDirectory = Path.GetDirectoryName(BlastnDbPath);
+
             if (dlg.ShowDialog() == true)
             {
                 BlastnDbPath = dlg.FileName;
@@ -160,6 +163,9 @@ namespace LocalBlast
 		{
 			var dlg = new OpenFileDialog();
             dlg.Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal";
+
+            if (File.Exists(BlastpDbPath))
+                dlg.InitialDirectory = Path.GetDirectoryName(BlastpDbPath);
 
             if (dlg.ShowDialog() == true)
 			{
@@ -199,6 +205,9 @@ namespace LocalBlast
             var dlg = new OpenFileDialog();
             dlg.Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal";
 
+            if (File.Exists(BlastxDbPath))
+                dlg.InitialDirectory = Path.GetDirectoryName(BlastxDbPath);
+
             if (dlg.ShowDialog() == true)
             {
                 BlastxDbPath = dlg.FileName;
@@ -237,12 +246,17 @@ namespace LocalBlast
             var dlg = new OpenFileDialog();
             dlg.Filter = "Alignment file(*.fa*)|*.fa*";
 
+            if (Directory.Exists(Settings.Default.SeqFileDir))
+                dlg.InitialDirectory = Settings.Default.SeqFileDir;
+
             if (dlg.ShowDialog() == true)
             {
                 string name = null;
                 var lines = new List<string>();
                 int ncpu = Environment.ProcessorCount;
                 int concurrents = 0;
+
+                Settings.Default.SeqFileDir = Path.GetDirectoryName(dlg.FileName);
 
                 using (var sr = File.OpenText(dlg.FileName))
                 {

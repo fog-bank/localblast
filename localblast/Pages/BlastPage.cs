@@ -57,6 +57,11 @@ namespace LocalBlast
         public DelegateCommand CopyAlignmentCommand { get; }
         public override DelegateCommand CloseCommand { get; }
 
+        public override string HeaderTooltip => string.Join(Environment.NewLine, 
+            Header,
+            "Program: " + Path.GetFileNameWithoutExtension(ExePath),
+            "Database: " + Path.GetFileNameWithoutExtension(DbPath));
+
         public string ExePath
         {
             get => exePath;
@@ -64,6 +69,7 @@ namespace LocalBlast
             {
                 exePath = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HeaderTooltip));
             }
         }
 
@@ -74,6 +80,7 @@ namespace LocalBlast
             {
                 dbPath = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HeaderTooltip));
             }
         }
 
@@ -246,8 +253,13 @@ namespace LocalBlast
                 Filter = "Alignment file(*.fa*)|*.fa*"
             };
 
+            if (Directory.Exists(Settings.Default.SeqFileDir))
+                dlg.InitialDirectory = Settings.Default.SeqFileDir;
+
             if (dlg.ShowDialog() == true)
             {
+                Settings.Default.SeqFileDir = Path.GetDirectoryName(dlg.FileName);
+
                 string name = null;
                 var lines = new List<string>();
 

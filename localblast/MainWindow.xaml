@@ -146,7 +146,7 @@
 								</Style>
 							</Image.Style>
 						</Image>
-						<TextBlock Text="{Binding Header}" MaxWidth="400" VerticalAlignment="Center" ToolTip="{Binding Header}" TextTrimming="CharacterEllipsis" />
+                        <TextBlock Text="{Binding Header}" MaxWidth="160" VerticalAlignment="Center" ToolTip="{Binding HeaderTooltip}" TextTrimming="CharacterEllipsis" />
 						<Button Margin="4,0,0,0" Padding="1" Background="{x:Null}" BorderBrush="{x:Null}" VerticalAlignment="Center" Command="{Binding CloseCommand}">
 							<Image Source="Resources/close.png" Height="12" />
 						</Button>

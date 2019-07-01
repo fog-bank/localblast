@@ -17,17 +17,20 @@ namespace LocalBlast
 
         public string Header
         {
-            get { return header; }
+            get => header;
             set
             {
                 header = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HeaderTooltip));
             }
         }
 
+        public virtual string HeaderTooltip => Header;
+
         public PageState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 state = value;
