@@ -317,14 +317,15 @@ namespace LocalBlast
             var sb = new StringBuilder();
 
             foreach (var pair in arglist)
-                sb.Append("-").Append(pair.Key).Append(" ").Append(pair.Value).Append(" ");
+                sb.Append('-').Append(pair.Key).Append(' ').Append(pair.Value).Append(' ');
 
             sb.Length--;
 
             var psi = new ProcessStartInfo(ExePath)
             {
                 Arguments = sb.ToString(),
-                WindowStyle = ProcessWindowStyle.Hidden
+                UseShellExecute = false,
+                CreateNoWindow = true
             };
 
             using (cts = new CancellationTokenSource())
