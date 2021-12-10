@@ -4,9 +4,9 @@ using System.Diagnostics;
 
 namespace LocalBlast
 {
-	public struct Span : IEquatable<Span>, IComparable<Span>
+	public struct SeqSpan : IEquatable<SeqSpan>, IComparable<SeqSpan>
 	{
-		public Span(int from, int to)
+		public SeqSpan(int from, int to)
 		{
 			From = Math.Min(from, to);
 			To = Math.Max(from, to);
@@ -18,34 +18,34 @@ namespace LocalBlast
 
 		public int Length => To - From + 1;
 
-		public bool Equals(Span other) => From == other.From && To == other.To;
+		public bool Equals(SeqSpan other) => From == other.From && To == other.To;
 
-		public override bool Equals(object obj) => obj is Span && Equals((Span)obj);
+		public override bool Equals(object? obj) => obj is SeqSpan span && Equals(span);
 
 		public bool Contains(int point) => From <= point && point <= To;
 
-		public bool Overlaps(Span other) => From <= other.To && other.From <= To;
+		public bool Overlaps(SeqSpan other) => From <= other.To && other.From <= To;
 
-		public bool IsNeighbor(Span other) => To + 1 == other.From || other.To + 1 == From;
+		public bool IsNeighbor(SeqSpan other) => To + 1 == other.From || other.To + 1 == From;
 
-		public bool IsSupersetOf(Span other) => From <= other.From && other.To <= To;
+		public bool IsSupersetOf(SeqSpan other) => From <= other.From && other.To <= To;
 
-		public bool IsSubsetOf(Span other) => other.IsSupersetOf(this);
+		public bool IsSubsetOf(SeqSpan other) => other.IsSupersetOf(this);
 
-		public static Span Union(Span one, Span other)
+		public static SeqSpan Union(SeqSpan one, SeqSpan other)
 		{
-			return new Span(Math.Min(one.From, other.From), Math.Max(one.To, other.To));
+			return new SeqSpan(Math.Min(one.From, other.From), Math.Max(one.To, other.To));
 		}
 
-		public static Span Intersect(Span one, Span other)
+		public static SeqSpan Intersect(SeqSpan one, SeqSpan other)
 		{
 			if (!one.Overlaps(other))
 				throw new ArgumentException();
 
-			return new Span(Math.Max(one.From, other.From), Math.Min(one.To, other.To));
+			return new SeqSpan(Math.Max(one.From, other.From), Math.Min(one.To, other.To));
 		}
 
-		public int CompareTo(Span other)
+		public int CompareTo(SeqSpan other)
 		{
 			int fromComp = From.CompareTo(other.From);
 			return (fromComp != 0) ? fromComp : other.To.CompareTo(To);
@@ -55,23 +55,23 @@ namespace LocalBlast
 
 		public override string ToString() => From == To ? From.ToString() : From + ".." + To;
 
-		public static bool operator ==(Span one, Span other) => one.Equals(other);
+		public static bool operator ==(SeqSpan one, SeqSpan other) => one.Equals(other);
 
-		public static bool operator !=(Span one, Span other) => !one.Equals(other);
+		public static bool operator !=(SeqSpan one, SeqSpan other) => !one.Equals(other);
 
-		public static bool operator >(Span one, Span other) => one.CompareTo(other) > 0;
+		public static bool operator >(SeqSpan one, SeqSpan other) => one.CompareTo(other) > 0;
 
-		public static bool operator >=(Span one, Span other) => one.CompareTo(other) >= 0;
+		public static bool operator >=(SeqSpan one, SeqSpan other) => one.CompareTo(other) >= 0;
 
-		public static bool operator <(Span one, Span other) => one.CompareTo(other) < 0;
+		public static bool operator <(SeqSpan one, SeqSpan other) => one.CompareTo(other) < 0;
 
-		public static bool operator <=(Span one, Span other) => one.CompareTo(other) <= 0;
+		public static bool operator <=(SeqSpan one, SeqSpan other) => one.CompareTo(other) <= 0;
 	}
 
 	[DebuggerDisplay("{DebuggerToString}")]
 	public class Location
 	{
-		private LinkedList<Span> segments = new LinkedList<Span>();
+		private LinkedList<SeqSpan> segments = new();
 
 		public Location()
 		{
@@ -79,7 +79,7 @@ namespace LocalBlast
 
 		public int NumberOfSegments => segments.Count;
 
-		public IEnumerable<Span> Segments => segments;
+		public IEnumerable<SeqSpan> Segments => segments;
 
 		public int TotalLength
 		{
@@ -120,7 +120,7 @@ namespace LocalBlast
 
 		private string DebuggerToString => NumberOfSegments > 3 ? "NumberOfSegments = " + NumberOfSegments : ToString();
 
-		public bool Overlaps(Span other)
+		public bool Overlaps(SeqSpan other)
 		{
 			foreach (var one in segments)
 			{
@@ -143,7 +143,7 @@ namespace LocalBlast
 			return false;
 		}
 
-		public bool IsSupersetOf(Span other)
+		public bool IsSupersetOf(SeqSpan other)
 		{
 			foreach (var seg in segments)
 			{
@@ -166,13 +166,13 @@ namespace LocalBlast
 			return true;
 		}
 
-		public void IntersectWith(Span other)
+		public void IntersectWith(SeqSpan other)
 		{
 			for (var node = segments.First; node != null; )
 			{
 				if (node.Value.Overlaps(other))
 				{
-					node.Value = Span.Intersect(node.Value, other);
+					node.Value = SeqSpan.Intersect(node.Value, other);
 					node = node.Next;
 				}
 				else
@@ -199,20 +199,20 @@ namespace LocalBlast
 			}
 
 			// A ∩ (∪{Bi}) = ∪{A ∩ Bi}
-			var spans = new List<Span>();
+			var spans = new List<SeqSpan>();
 
 			foreach (var one in segments)
 			{
 				foreach (var other in location.segments)
 				{
 					if (one.Overlaps(other))
-						spans.Add(Span.Intersect(one, other));
+						spans.Add(SeqSpan.Intersect(one, other));
 				}
 			}
-			segments = new LinkedList<Span>(spans);
+			segments = new LinkedList<SeqSpan>(spans);
 		}
 
-		public void UnionWith(Span other)
+		public void UnionWith(SeqSpan other)
 		{
 			bool added = false;
 
@@ -222,7 +222,7 @@ namespace LocalBlast
 				{
 					if (CanUnion(node.Value, other))
 					{
-						node.Value = Span.Union(node.Value, other);
+						node.Value = SeqSpan.Union(node.Value, other);
 						added = true;
 					}
 					else if (other.To < node.Value.From)
@@ -238,7 +238,7 @@ namespace LocalBlast
 
 					if (CanUnion(prevNode.Value, node.Value))
 					{
-						prevNode.Value = Span.Union(prevNode.Value, node.Value);
+						prevNode.Value = SeqSpan.Union(prevNode.Value, node.Value);
 						segments.Remove(node);
 						node = prevNode;
 					}
@@ -262,8 +262,10 @@ namespace LocalBlast
 			return "join(" + string.Join(",", segments) + ")";
 		}
 
-		private bool Invalidate()
-		{
+#if DEBUG
+#pragma warning disable IDE0051 // Remove unused private members
+        private bool Invalidate()
+        {
 			for (var node1 = segments.First; node1 != null; node1 = node1.Next)
 			{
 				if (node1.Previous != null && node1.Previous.Value.To + 1 >= node1.Value.From)
@@ -271,7 +273,9 @@ namespace LocalBlast
 			}
 			return true;
 		}
+#pragma warning restore IDE0051
+#endif
 
-		private bool CanUnion(Span one, Span other) => one.Overlaps(other) || one.IsNeighbor(other);
+		private static bool CanUnion(SeqSpan one, SeqSpan other) => one.Overlaps(other) || one.IsNeighbor(other);
 	}
 }

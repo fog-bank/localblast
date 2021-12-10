@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -14,21 +15,21 @@ namespace LocalBlast
 {
     public abstract class BlastPage : TabPage
     {
-        private string exePath;
-        private string dbPath;
-        private string query;
-        private string jobTitle;
+        private string? exePath;
+        private string? dbPath;
+        private string? query;
+        private string? jobTitle;
         private string jobId = Guid.NewGuid().ToString();
         private bool cleanup = true;
 
         private bool running;
-        private CancellationTokenSource cts;
+        private CancellationTokenSource? cts;
 
         private int queryLength;
-        private string message;
-        private List<Hit> hits = new List<Hit>();
-        private Hit selectedHit;
-        private SegmentPair selectedSegment;
+        private string? message;
+        private List<Hit>? hits;
+        private Hit? selectedHit;
+        private SegmentPair? selectedSegment;
         private double zoomLevel = 1;
 
         protected BlastPage(MainViewModel owner)
@@ -62,7 +63,7 @@ namespace LocalBlast
             "Program: " + Path.GetFileNameWithoutExtension(ExePath),
             "Database: " + Path.GetFileNameWithoutExtension(DbPath));
 
-        public string ExePath
+        public string? ExePath
         {
             get => exePath;
             set
@@ -73,7 +74,7 @@ namespace LocalBlast
             }
         }
 
-        public string DbPath
+        public string? DbPath
         {
             get => dbPath;
             set
@@ -84,7 +85,7 @@ namespace LocalBlast
             }
         }
 
-        public string Query
+        public string? Query
         {
             get => query;
             set
@@ -98,7 +99,7 @@ namespace LocalBlast
                         if (index >= 2)
                             JobTitle = value.Substring(1, index).Trim();
 
-                        value = value.Substring(index + 1);
+                        value = value[(index + 1)..];
                     }
                     else if (value.StartsWith("#"))
                     {
@@ -111,14 +112,14 @@ namespace LocalBlast
                         int index2 = value.IndexOf("1\r\n", index + 1);
 
                         if (index2 != -1)
-                            value = value.Substring(index2 + 3);
+                            value = value[(index2 + 3)..];
                         else
                         {
                             // Protein
                             index2 = value.IndexOf("0\r\n", index + 1);
 
                             if (index2 != -1)
-                                value = value.Substring(index2 + 3);
+                                value = value[(index2 + 3)..];
                         }
                     }
                 }
@@ -128,7 +129,7 @@ namespace LocalBlast
             }
         }
 
-        public string JobTitle
+        public string? JobTitle
         {
             get => jobTitle;
             set
@@ -136,7 +137,7 @@ namespace LocalBlast
                 jobTitle = value;
                 OnPropertyChanged();
 
-                Header = JobTitle?.Split(' ')[0];
+                Header = JobTitle?.Split(' ')[0] ?? string.Empty;
             }
         }
 
@@ -170,7 +171,7 @@ namespace LocalBlast
             }
         }
 
-        public string Message
+        public string? Message
         {
             get => message;
             set
@@ -180,7 +181,7 @@ namespace LocalBlast
             }
         }
 
-        public List<Hit> Hits
+        public List<Hit>? Hits
         {
             get => hits;
             set
@@ -190,7 +191,7 @@ namespace LocalBlast
             }
         }
 
-        public Hit SelectedHit
+        public Hit? SelectedHit
         {
             get => selectedHit;
             set
@@ -210,7 +211,7 @@ namespace LocalBlast
             }
         }
 
-        public SegmentPair SelectedSegment
+        public SegmentPair? SelectedSegment
         {
             get => selectedSegment;
             set
@@ -244,9 +245,9 @@ namespace LocalBlast
             }
         }
 
-        public Thickness ZoomedThickness => new Thickness(1 / ZoomLevel, 1, 1 / ZoomLevel, 1);
+        public Thickness ZoomedThickness => new(1 / ZoomLevel, 1, 1 / ZoomLevel, 1);
 
-        public void LoadSequence(object parameter)
+        public void LoadSequence(object? parameter)
         {
             var dlg = new OpenFileDialog
             {
@@ -260,19 +261,19 @@ namespace LocalBlast
             {
                 Settings.Default.SeqFileDir = Path.GetDirectoryName(dlg.FileName);
 
-                string name = null;
+                string? name = null;
                 var lines = new List<string>();
 
                 using (var sr = File.OpenText(dlg.FileName))
                 {
-                    for (string line = sr.ReadLine(); line != null; line = sr.ReadLine())
+                    for (string? line = sr.ReadLine(); line != null; line = sr.ReadLine())
                     {
                         if (line.StartsWith(">"))
                         {
                             if (name != null)
                                 break;
 
-                            name = line.Substring(1);
+                            name = line[1..];
                         }
                         else
                             lines.Add(line);
@@ -284,9 +285,9 @@ namespace LocalBlast
             }
         }
 
-        public bool CanLoadSequence(object parameter) => !running;
+        public bool CanLoadSequence(object? parameter) => !running;
 
-        public async void Run(object parameter)
+        public async void Run(object? parameter)
         {
             State = PageState.Running;
             running = true;
@@ -351,8 +352,8 @@ namespace LocalBlast
                         var ns = XNamespace.Get("http://www.ncbi.nlm.nih.gov");
 
                         var search = xml.Descendants(ns + "Search").First();
-                        int queryLength = (int)search.Element(ns + "query-len");
-                        string message = (string)search.Element(ns + "message");
+                        int queryLength = (int?)search.Element(ns + "query-len") ?? 0;
+                        string? message = (string?)search.Element(ns + "message");
 
                         App.Current.Dispatcher.Invoke(() =>
                         {
@@ -390,7 +391,7 @@ namespace LocalBlast
             LoadSequenceCommand.OnCanExecuteChanged();
         }
 
-        private Task<int> RunBlast(ProcessStartInfo psi, CancellationToken ct)
+        private static Task<int> RunBlast(ProcessStartInfo psi, CancellationToken ct)
         {
             var tcs = new TaskCompletionSource<int>();
             var proc = new Process();
@@ -420,68 +421,68 @@ namespace LocalBlast
             return tcs.Task;
         }
 
-        public bool CanRun(object parameter)
+        public bool CanRun(object? parameter)
         {
             return !running && !string.IsNullOrWhiteSpace(Query);
         }
 
-        public void Cancel(object parameter)
+        public void Cancel(object? parameter)
         {
             cts?.Cancel();
             State = PageState.Error;
         }
 
-        public bool CanCancel(object parameter)
+        public bool CanCancel(object? parameter)
         {
             return cts != null && !cts.IsCancellationRequested;
         }
 
-        public void PreviousHit(object parameter)
+        public void PreviousHit(object? parameter)
         {
-            SelectedHit = Hits[SelectedHit.Index - 2];
+            SelectedHit = Hits![SelectedHit!.Index - 2];
         }
 
-        public bool CanPreviousHit(object parameter)
+        public bool CanPreviousHit(object? parameter)
         {
-            return SelectedHit != null && SelectedHit.Index >= 2 && SelectedHit.Index <= Hits.Count;
+            return Hits != null && SelectedHit != null && SelectedHit.Index >= 2 && SelectedHit.Index <= Hits.Count;
         }
 
-        public void NextHit(object parameter)
+        public void NextHit(object? parameter)
         {
-            SelectedHit = Hits[SelectedHit.Index];
+            SelectedHit = Hits![SelectedHit!.Index];
         }
 
-        public bool CanNextHit(object parameter)
+        public bool CanNextHit(object? parameter)
         {
-            return SelectedHit != null && SelectedHit.Index >= 1 && SelectedHit.Index <= Hits.Count - 1;
+            return Hits != null && SelectedHit != null && SelectedHit.Index >= 1 && SelectedHit.Index <= Hits.Count - 1;
         }
 
-        public void PreviousSegmentPair(object parameter)
+        public void PreviousSegmentPair(object? parameter)
         {
-            SelectedSegment = SelectedHit.Segments[SelectedSegment.Index - 2];
+            SelectedSegment = SelectedHit!.Segments[SelectedSegment!.Index - 2];
         }
 
-        public bool CanPreviousSegmentPair(object parameter)
+        public bool CanPreviousSegmentPair(object? parameter)
         {
             return SelectedHit != null && SelectedSegment != null && SelectedSegment.Index >= 2 && SelectedSegment.Index <= SelectedHit.Segments.Count;
         }
 
-        public void NextSegmentPair(object parameter)
+        public void NextSegmentPair(object? parameter)
         {
-            SelectedSegment = SelectedHit.Segments[SelectedSegment.Index];
+            SelectedSegment = SelectedHit!.Segments[SelectedSegment!.Index];
         }
 
-        public bool CanNextSegmentPair(object parameter)
+        public bool CanNextSegmentPair(object? parameter)
         {
             return SelectedHit != null && SelectedSegment != null && SelectedSegment.Index >= 1 && SelectedSegment.Index <= SelectedHit.Segments.Count - 1;
         }
 
-        public void CopyAlignment(object parameter)
+        public void CopyAlignment(object? parameter)
         {
-            if (SelectedSegment == null)
-                return;
-
             var seg = SelectedSegment;
+
+            if (seg == null || seg.QuerySeq == null || seg.HitSeq == null)
+                return;
 
             var sb = new StringBuilder();
             string queryName = sb.Append("Query:").Append(seg.QueryFrom).Append("..").Append(seg.QueryTo).ToString();
@@ -492,11 +493,11 @@ namespace LocalBlast
 
             sb.Capacity = queryName.Length + seg.QuerySeq.Length + hitName.Length + seg.HitSeq.Length + 5;
 
-            sb.Append(">").AppendLine(queryName).AppendLine(seg.QuerySeq).Append(">").AppendLine(hitName).Append(seg.HitSeq);
+            sb.Append('>').AppendLine(queryName).AppendLine(seg.QuerySeq).Append('>').AppendLine(hitName).Append(seg.HitSeq);
             Clipboard.SetText(sb.ToString());
         }
 
-        public virtual void Close(object parameter)
+        public virtual void Close(object? parameter)
         {
             if (cts != null)
             {

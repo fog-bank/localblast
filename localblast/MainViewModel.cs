@@ -8,7 +8,7 @@ namespace LocalBlast
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private readonly ObservableCollection<TabPage> tabs = new ObservableCollection<TabPage>();
+        private readonly ObservableCollection<TabPage> tabs = new();
         private int tabIndex = -1;
         private string blastBinDir = Settings.Default.BlastBinDir;
         private string wd = Path.Combine(Environment.CurrentDirectory, "Temp\\");
@@ -97,11 +97,11 @@ namespace LocalBlast
                 Directory.CreateDirectory(WorkingDirectory);
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

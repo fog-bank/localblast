@@ -11,9 +11,9 @@ namespace LocalBlast
 
 		public string DefaultKey { get; set; } = "Default";
 
-		public string KeySuffix { get; set; }
+		public string? KeySuffix { get; set; }
 
-		public override DataTemplate SelectTemplate(object item, DependencyObject container)
+		public override DataTemplate? SelectTemplate(object item, DependencyObject container)
 		{
 			var parent = FindParent<TabControl>(container);
 
@@ -35,15 +35,14 @@ namespace LocalBlast
 			return null;
 		}
 
-		private static TVisual FindParent<TVisual>(DependencyObject visual) where TVisual : Visual
+		private static TVisual? FindParent<TVisual>(DependencyObject visual) where TVisual : Visual
 		{
 			var obj = VisualTreeHelper.GetParent(visual);
 
 			if (obj == null)
 				return null;
 
-			var parent = obj as TVisual;
-			return parent != null ? parent : FindParent<TVisual>(obj);
-		}
+            return obj is TVisual parent ? parent : FindParent<TVisual>(obj);
+        }
 	}
 }

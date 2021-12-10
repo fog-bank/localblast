@@ -5,31 +5,31 @@ namespace LocalBlast
 {
 	public class DelegateCommand : ICommand
 	{
-		private readonly Action<object> execute;
-		private readonly Func<object, bool> canExecute;
+		private readonly Action<object?>? execute;
+		private readonly Func<object?, bool>? canExecute;
 
-		public DelegateCommand(Action<object> execute)
+		public DelegateCommand(Action<object?>? execute)
 			: this(execute, null)
 		{
 		}
 
-		public DelegateCommand(Action<object> execute, Func<object, bool> canExecute)
+		public DelegateCommand(Action<object?>? execute, Func<object?, bool>? canExecute)
 		{
 			this.execute = execute;
 			this.canExecute = canExecute;
 		}
 
-		public void Execute(object parameter = null)
+		public void Execute(object? parameter = null)
 		{
-			execute(parameter);
+			execute?.Invoke(parameter);
 		}
 
-		public bool CanExecute(object parameter = null)
+		public bool CanExecute(object? parameter = null)
 		{
 			return canExecute == null || canExecute(parameter);
 		}
 
-        public void TryExecute(object exeParameter = null, object canParameter = null)
+        public void TryExecute(object? exeParameter = null, object? canParameter = null)
         {
             if (CanExecute(canParameter))
                 Execute(exeParameter);
@@ -40,6 +40,6 @@ namespace LocalBlast
 			CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 		}
 
-		public event EventHandler CanExecuteChanged;
+		public event EventHandler? CanExecuteChanged;
 	}
 }

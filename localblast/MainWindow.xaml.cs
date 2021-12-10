@@ -21,7 +21,7 @@ namespace LocalBlast
             base.OnClosing(e);
         }
 
-        private void OnCloseAllTab(object sender, RoutedEventArgs e)
+        private void OnCloseAllTab(object? sender, RoutedEventArgs e)
         {
             if (ViewModel != null && ViewModel.Tabs != null)
             {
@@ -40,7 +40,7 @@ namespace LocalBlast
             }
         }
 
-        private void SegmentOnMouseEnter(object sender, MouseEventArgs e)
+        private void SegmentOnMouseEnter(object? sender, MouseEventArgs e)
         {
             var element = sender as FrameworkElement;
             var segment = element.DataContext as SegmentPair;

@@ -5,7 +5,7 @@ namespace LocalBlast
 {
     public abstract class TabPage : INotifyPropertyChanged
     {
-        private string header;
+        private string? header;
         private PageState state;
 
         public TabPage(MainViewModel owner)
@@ -15,7 +15,7 @@ namespace LocalBlast
 
         public MainViewModel Owner { get; }
 
-        public string Header
+        public string? Header
         {
             get => header;
             set
@@ -26,7 +26,7 @@ namespace LocalBlast
             }
         }
 
-        public virtual string HeaderTooltip => Header;
+        public virtual string? HeaderTooltip => Header;
 
         public PageState State
         {
@@ -40,13 +40,13 @@ namespace LocalBlast
 
         public abstract DelegateCommand CloseCommand { get; }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             //Debug.WriteLine(GetType().Name + "." + propertyName);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     public enum PageState
