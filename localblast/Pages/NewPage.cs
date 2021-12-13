@@ -9,10 +9,6 @@ namespace LocalBlast
 {
 	public class NewPage : TabPage
 	{
-        private string blastnDatabasePath = Settings.Default.BlastnDbPath;
-        private string blastpDatabasePath = Settings.Default.BlastpDbPath;
-        private string blastxDatabasePath = Settings.Default.BlastxDbPath;
-
         public NewPage(MainViewModel owner)
 			: base(owner)
 		{
@@ -57,14 +53,11 @@ namespace LocalBlast
 
         public override DelegateCommand CloseCommand { get; }
 
-        public int ProcessorCount => Environment.ProcessorCount;
-
         public string BlastnDbPath
         {
-            get => blastnDatabasePath;
+            get => Settings.Default.BlastnDbPath;
             set
             {
-                blastnDatabasePath = value;
                 Settings.Default.BlastnDbPath = value;
                 OnPropertyChanged();
             }
@@ -72,10 +65,9 @@ namespace LocalBlast
 
         public string BlastpDbPath
         {
-            get => blastpDatabasePath;
+            get => Settings.Default.BlastpDbPath;
             set
             {
-                blastpDatabasePath = value;
                 Settings.Default.BlastpDbPath = value;
                 OnPropertyChanged();
             }
@@ -83,14 +75,15 @@ namespace LocalBlast
 
         public string BlastxDbPath
         {
-            get => blastxDatabasePath;
+            get => Settings.Default.BlastxDbPath;
             set
             {
-                blastxDatabasePath = value;
                 Settings.Default.BlastxDbPath = value;
                 OnPropertyChanged();
             }
         }
+
+        public static int ProcessorCount => Environment.ProcessorCount;
 
         public void BrowseBlastBinDir(object? parameter)
         {

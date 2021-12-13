@@ -43,7 +43,7 @@ namespace LocalBlast
         private void SegmentOnMouseEnter(object? sender, MouseEventArgs e)
         {
             var element = sender as FrameworkElement;
-            var segment = element.DataContext as SegmentPair;
+            var segment = element?.DataContext as SegmentPair;
             (segment.Parent.Parent as BlastPage).SelectedSegment = segment;
 
         }

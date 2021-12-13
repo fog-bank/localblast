@@ -236,7 +236,7 @@ namespace LocalBlast
             get => zoomLevel;
             set
             {
-                if (value <= 0)
+                if (value <= 0 || value > 1)
                     throw new ArgumentOutOfRangeException(nameof(value));
 
                 zoomLevel = value;

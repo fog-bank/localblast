@@ -61,7 +61,7 @@ namespace LocalBlast
             }
         }
 
-        public override void Close(object parameter)
+        public override void Close(object? parameter)
         {
             base.Close(parameter);
 
