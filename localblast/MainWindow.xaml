@@ -49,6 +49,7 @@
 					ItemTemplateSelector="{DynamicResource itemTemplates}" ContentTemplateSelector="{DynamicResource contentTemplates}">
             <TabControl.Resources>
                 <Style x:Key="alignView" TargetType="ListBox">
+                    <EventSetter Event="KeyDown" Handler="AlignViewOnKeyDown" />
                     <Setter Property="BorderThickness" Value="0" />
                     <Setter Property="HorizontalAlignment" Value="Left" />
                     <Setter Property="IsSynchronizedWithCurrentItem" Value="True" />

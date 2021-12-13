@@ -12,7 +12,7 @@ namespace LocalBlast
             InitializeComponent();
         }
 
-        public MainViewModel ViewModel => DataContext as MainViewModel;
+        public MainViewModel ViewModel => (MainViewModel)DataContext;
 
         protected override void OnClosing(CancelEventArgs e)
         {
@@ -40,12 +40,29 @@ namespace LocalBlast
             }
         }
 
+        private void AlignViewOnKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Right:
+                    if (sender is FrameworkElement element && element.DataContext is BlastPage page && page.CanNextSegmentPair(null))
+                        page.NextSegmentPair(null);
+                    break;
+
+                case Key.Left:
+                    if (sender is FrameworkElement element2 && element2.DataContext is BlastPage page2 && page2.CanPreviousSegmentPair(null))
+                        page2.PreviousSegmentPair(null);
+                    break;
+            }
+        }
+
         private void SegmentOnMouseEnter(object? sender, MouseEventArgs e)
         {
             var element = sender as FrameworkElement;
             var segment = element?.DataContext as SegmentPair;
-            (segment.Parent.Parent as BlastPage).SelectedSegment = segment;
 
+            if (segment?.Parent?.Parent is BlastPage page)
+                page.SelectedSegment = segment;
         }
     }
 }
