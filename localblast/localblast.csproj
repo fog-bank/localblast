@@ -18,7 +18,7 @@
 		<Copyright>Copyright © 2021 fog-bank. Some rights reserved.</Copyright>
 		<RepositoryUrl>https://github.com/fog-bank/localblast</RepositoryUrl>
 		<AssemblyVersion>0.3.0</AssemblyVersion>
-		<FileVersion>0.3.11210.0</FileVersion>
+		<FileVersion>0.3.11213.0</FileVersion>
 	</PropertyGroup>
 	<!-- Resources -->
 	<ItemGroup>

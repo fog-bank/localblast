@@ -168,7 +168,7 @@ namespace LocalBlast
             }
         }
 
-        public override void Close(object parameter)
+        public override void Close(object? parameter)
         {
             base.Close(parameter);
 
@@ -187,6 +187,10 @@ namespace LocalBlast
 
             switch (Task)
             {
+                case BlastnTask.Megablast:
+                    arglist["task"] = "megablast";
+                    break;
+
                 case BlastnTask.DiscontiguousMegablast:
                     arglist["task"] = "dc-megablast";
                     break;
@@ -198,17 +202,13 @@ namespace LocalBlast
                 case BlastnTask.BlastnShort:
                     arglist["task"] = "blastn-short";
                     break;
-
-                default:
-                    arglist["task"] = "megablast";
-                    break;
             }
 
             arglist["evalue"] = evalue.ToString(culture);
             arglist["max_hsps"] = MaxHitSegmentPairs.ToString(culture);
             arglist["max_target_seqs"] = MaxTargetSequences.ToString(culture);
 
-            if (!dust)
+            if (!QueryFilterWithDust)
                 arglist["dust"] = "no";
 
             if (QuerySubranged)

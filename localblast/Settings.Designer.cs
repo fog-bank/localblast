@@ -205,7 +205,7 @@ namespace LocalBlast {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int BlastnMaxTargetSeqs {
             get {
                 return ((int)(this["BlastnMaxTargetSeqs"]));
@@ -277,7 +277,7 @@ namespace LocalBlast {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
         public int BlastxMaxTargetSeqs {
             get {
                 return ((int)(this["BlastxMaxTargetSeqs"]));
@@ -301,7 +301,7 @@ namespace LocalBlast {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.05")]
         public double BlastnEvalue {
             get {
                 return ((double)(this["BlastnEvalue"]));
@@ -320,6 +320,30 @@ namespace LocalBlast {
             }
             set {
                 this["SeqFileDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int NumOfThreads {
+            get {
+                return ((int)(this["NumOfThreads"]));
+            }
+            set {
+                this["NumOfThreads"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string WorkingDirectory {
+            get {
+                return ((string)(this["WorkingDirectory"]));
+            }
+            set {
+                this["WorkingDirectory"] = value;
             }
         }
     }

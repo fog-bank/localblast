@@ -19,6 +19,7 @@ namespace LocalBlast
 			Header = "New job";
 
             BrowseBlastBinDirCommand = new DelegateCommand(BrowseBlastBinDir);
+            BrowseWorkingDirCommand = new DelegateCommand(BrowseWorkingDir);
 
             OpenMakeBlastDbCommand = new DelegateCommand(OpenMakeBlastDb, CanOpenMakeBlastDb);
 
@@ -38,6 +39,8 @@ namespace LocalBlast
 		}
 
         public DelegateCommand BrowseBlastBinDirCommand { get; }
+        public DelegateCommand BrowseWorkingDirCommand { get; }
+
         public DelegateCommand OpenMakeBlastDbCommand { get; }
 
         public DelegateCommand BrowseBlastnDbCommand { get; }
@@ -53,6 +56,8 @@ namespace LocalBlast
         public DelegateCommand OpenAlginBlastxCommand { get; }
 
         public override DelegateCommand CloseCommand { get; }
+
+        public int ProcessorCount => Environment.ProcessorCount;
 
         public string BlastnDbPath
         {
@@ -94,7 +99,7 @@ namespace LocalBlast
                 dlg.IsFolderPicker = true;
 
                 if (parameter is string defaultDir && Directory.Exists(defaultDir))
-                    dlg.DefaultDirectory = defaultDir;
+                    dlg.InitialDirectory = defaultDir;
 
                 if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
                 {
@@ -104,6 +109,20 @@ namespace LocalBlast
                     OpenBlastpCommand.OnCanExecuteChanged();
                     OpenAlginBlastpCommand.OnCanExecuteChanged();
                 }
+            }
+        }
+
+        public void BrowseWorkingDir(object? parameter)
+        {
+            using (var dlg = new CommonOpenFileDialog())
+            {
+                dlg.IsFolderPicker = true;
+
+                if (parameter is string defaultDir && Directory.Exists(defaultDir))
+                    dlg.InitialDirectory = defaultDir;
+
+                if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+                    Owner.WorkingDirectory = dlg.FileName;
             }
         }
 

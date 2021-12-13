@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -310,7 +310,8 @@ namespace LocalBlast
                 ["db"] = "\"" + DbPath + "\"",
                 ["query"] = "\"" + queryPath + "\"",
                 ["out"] = "\"" + outPath + "\"",
-                ["outfmt"] = "16"
+                ["outfmt"] = "16",
+                ["num_threads"] = Owner.NumberOfThreads.ToString(CultureInfo.InvariantCulture)
             };
 
             SetArgument(arglist);

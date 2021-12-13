@@ -11,11 +11,15 @@ namespace LocalBlast
         private readonly ObservableCollection<TabPage> tabs = new();
         private int tabIndex = -1;
         private string blastBinDir = Settings.Default.BlastBinDir;
-        private string wd = Path.Combine(Environment.CurrentDirectory, "Temp\\");
+        private string wd = Settings.Default.WorkingDirectory;
+        private int numOfThreads = Settings.Default.NumOfThreads;
 
         public MainViewModel()
         {
             tabs.Add(new NewPage(this));
+            
+            if (!Directory.Exists(wd))
+                WorkingDirectory = Environment.CurrentDirectory;
         }
 
         public double WindowWidth
@@ -87,6 +91,18 @@ namespace LocalBlast
             set
             {
                 wd = value;
+                Settings.Default.WorkingDirectory = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int NumberOfThreads
+        {
+            get { return numOfThreads; }
+            set
+            {
+                numOfThreads = value;
+                Settings.Default.NumOfThreads = value;
                 OnPropertyChanged();
             }
         }

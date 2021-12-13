@@ -48,7 +48,7 @@
       <Value Profile="(Default)">Megablast</Value>
     </Setting>
     <Setting Name="BlastnMaxTargetSeqs" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">500</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="BlastnMaxHsps" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">500</Value>
@@ -66,15 +66,21 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="BlastxMaxTargetSeqs" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">500</Value>
+      <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="BlastnDust" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="BlastnEvalue" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">10</Value>
+      <Value Profile="(Default)">0.05</Value>
     </Setting>
     <Setting Name="SeqFileDir" Type="System.String" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
+    <Setting Name="NumOfThreads" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">1</Value>
+    </Setting>
+    <Setting Name="WorkingDirectory" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
   </Settings>
