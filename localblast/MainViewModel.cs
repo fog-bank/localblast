@@ -8,19 +8,25 @@ namespace LocalBlast
 {
     public class MainViewModel : INotifyPropertyChanged
     {
-        private readonly ObservableCollection<TabPage> tabs = new ObservableCollection<TabPage>();
+        private readonly ObservableCollection<TabPage> tabs = new();
         private int tabIndex = -1;
         private string blastBinDir = Settings.Default.BlastBinDir;
-        private string wd = Path.Combine(Environment.CurrentDirectory, "Temp\\");
+        private string wd = Settings.Default.WorkingDirectory;
+        private int numOfThreads = Settings.Default.NumOfThreads;
+        private bool limitsBlastHitsView = Settings.Default.LimitsBlastHitsView;
+        private int initialBlastHitsView = Settings.Default.InitialBlastHitsView;
 
         public MainViewModel()
         {
             tabs.Add(new NewPage(this));
+            
+            if (!Directory.Exists(wd))
+                WorkingDirectory = Environment.CurrentDirectory;
         }
 
         public double WindowWidth
         {
-            get { return Settings.Default.WindowWidth; }
+            get => Settings.Default.WindowWidth;
             set
             {
                 Settings.Default.WindowWidth = value;
@@ -30,7 +36,7 @@ namespace LocalBlast
 
         public double WindowHeight
         {
-            get { return Settings.Default.WindowHeight; }
+            get => Settings.Default.WindowHeight;
             set
             {
                 Settings.Default.WindowHeight = value;
@@ -40,7 +46,7 @@ namespace LocalBlast
 
         public double WindowTop
         {
-            get { return Settings.Default.WindowTop; }
+            get => Settings.Default.WindowTop;
             set
             {
                 Settings.Default.WindowTop = value;
@@ -50,7 +56,7 @@ namespace LocalBlast
 
         public double WindowLeft
         {
-            get { return Settings.Default.WindowLeft; }
+            get => Settings.Default.WindowLeft;
             set
             {
                 Settings.Default.WindowLeft = value;
@@ -62,7 +68,7 @@ namespace LocalBlast
 
         public int SelectedTabIndex
         {
-            get { return tabIndex; }
+            get => tabIndex;
             set
             {
                 tabIndex = value;
@@ -72,7 +78,7 @@ namespace LocalBlast
 
         public string BlastBinDir
         {
-            get { return blastBinDir; }
+            get => blastBinDir;
             set
             {
                 blastBinDir = value;
@@ -83,10 +89,44 @@ namespace LocalBlast
 
         public string WorkingDirectory
         {
-            get { return wd; }
+            get => wd;
             set
             {
                 wd = value;
+                Settings.Default.WorkingDirectory = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int NumberOfThreads
+        {
+            get => numOfThreads;
+            set
+            {
+                numOfThreads = value;
+                Settings.Default.NumOfThreads = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public bool LimitsBlastHitsView
+        {
+            get => limitsBlastHitsView;
+            set
+            {
+                limitsBlastHitsView = value;
+                Settings.Default.LimitsBlastHitsView = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public int InitialBlastHitsView
+        {
+            get => initialBlastHitsView;
+            set
+            {
+                initialBlastHitsView = value;
+                Settings.Default.InitialBlastHitsView = value;
                 OnPropertyChanged();
             }
         }
@@ -97,11 +137,11 @@ namespace LocalBlast
                 Directory.CreateDirectory(WorkingDirectory);
         }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 }

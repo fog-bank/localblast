@@ -12,7 +12,7 @@ namespace LocalBlast {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "15.1.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -188,6 +188,186 @@ namespace LocalBlast {
             }
             set {
                 this["BlastnDescPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Megablast")]
+        public string BlastnTask {
+            get {
+                return ((string)(this["BlastnTask"]));
+            }
+            set {
+                this["BlastnTask"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int BlastnMaxTargetSeqs {
+            get {
+                return ((int)(this["BlastnMaxTargetSeqs"]));
+            }
+            set {
+                this["BlastnMaxTargetSeqs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("500")]
+        public int BlastnMaxHsps {
+            get {
+                return ((int)(this["BlastnMaxHsps"]));
+            }
+            set {
+                this["BlastnMaxHsps"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string BlastxQueryPaneHeight {
+            get {
+                return ((string)(this["BlastxQueryPaneHeight"]));
+            }
+            set {
+                this["BlastxQueryPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string BlastxResultPaneHeight {
+            get {
+                return ((string)(this["BlastxResultPaneHeight"]));
+            }
+            set {
+                this["BlastxResultPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string BlastxDescPaneHeight {
+            get {
+                return ((string)(this["BlastxDescPaneHeight"]));
+            }
+            set {
+                this["BlastxDescPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string BlastxDbPath {
+            get {
+                return ((string)(this["BlastxDbPath"]));
+            }
+            set {
+                this["BlastxDbPath"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int BlastxMaxTargetSeqs {
+            get {
+                return ((int)(this["BlastxMaxTargetSeqs"]));
+            }
+            set {
+                this["BlastxMaxTargetSeqs"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool BlastnDust {
+            get {
+                return ((bool)(this["BlastnDust"]));
+            }
+            set {
+                this["BlastnDust"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0.05")]
+        public double BlastnEvalue {
+            get {
+                return ((double)(this["BlastnEvalue"]));
+            }
+            set {
+                this["BlastnEvalue"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SeqFileDir {
+            get {
+                return ((string)(this["SeqFileDir"]));
+            }
+            set {
+                this["SeqFileDir"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1")]
+        public int NumOfThreads {
+            get {
+                return ((int)(this["NumOfThreads"]));
+            }
+            set {
+                this["NumOfThreads"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string WorkingDirectory {
+            get {
+                return ((string)(this["WorkingDirectory"]));
+            }
+            set {
+                this["WorkingDirectory"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool LimitsBlastHitsView {
+            get {
+                return ((bool)(this["LimitsBlastHitsView"]));
+            }
+            set {
+                this["LimitsBlastHitsView"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int InitialBlastHitsView {
+            get {
+                return ((int)(this["InitialBlastHitsView"]));
+            }
+            set {
+                this["InitialBlastHitsView"] = value;
             }
         }
     }

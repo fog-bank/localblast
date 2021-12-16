@@ -1,12 +1,11 @@
 ﻿using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
 namespace LocalBlast
 {
     public abstract class TabPage : INotifyPropertyChanged
     {
-        private string header;
+        private string? header;
         private PageState state;
 
         public TabPage(MainViewModel owner)
@@ -16,19 +15,22 @@ namespace LocalBlast
 
         public MainViewModel Owner { get; }
 
-        public string Header
+        public string? Header
         {
-            get { return header; }
+            get => header;
             set
             {
                 header = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(HeaderTooltip));
             }
         }
 
+        public virtual string? HeaderTooltip => Header;
+
         public PageState State
         {
-            get { return state; }
+            get => state;
             set
             {
                 state = value;
@@ -38,13 +40,13 @@ namespace LocalBlast
 
         public abstract DelegateCommand CloseCommand { get; }
 
-        protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
             //Debug.WriteLine(GetType().Name + "." + propertyName);
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
+        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
     public enum PageState

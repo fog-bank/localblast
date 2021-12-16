@@ -10,15 +10,13 @@ namespace LocalBlast
 {
     public class MakeBlastDbPage : TabPage
     {
-        private string path;
-        private string input;
-        private string output;
-        private MakeBlastDbType[] dbTypes = { MakeBlastDbType.Nucleotide, MakeBlastDbType.Protein };
+        private string? path;
+        private string? input;
+        private string? output;
         private MakeBlastDbType dbType = MakeBlastDbType.Nucleotide;
 
         private bool running;
-        private CancellationTokenSource cts;
-        private ObservableCollection<string> stdout = new ObservableCollection<string>();
+        private CancellationTokenSource? cts;
 
         public MakeBlastDbPage(MainViewModel owner)
             : base(owner)
@@ -39,9 +37,9 @@ namespace LocalBlast
         public DelegateCommand BrowseOutputFileCommand { get; }
         public override DelegateCommand CloseCommand { get; }
 
-        public string MakeBlastDbPath
+        public string? MakeBlastDbPath
         {
-            get { return path; }
+            get => path;
             set
             {
                 path = value;
@@ -49,24 +47,24 @@ namespace LocalBlast
             }
         }
 
-        public string Input
+        public string? Input
         {
-            get { return input; }
+            get => input;
             set
             {
                 input = value;
                 OnPropertyChanged();
 
-                if (string.IsNullOrEmpty(Output))
+                if (string.IsNullOrEmpty(Output) && value != null)
                     Output = Path.Combine(Path.GetDirectoryName(value), Path.GetFileNameWithoutExtension(value));
 
                 RunCommand.OnCanExecuteChanged();
             }
         }
 
-        public string Output
+        public string? Output
         {
-            get { return output; }
+            get => output;
             set
             {
                 output = value;
@@ -74,11 +72,11 @@ namespace LocalBlast
             }
         }
 
-        public MakeBlastDbType[] DbTypes => dbTypes;
+        public MakeBlastDbType[] DbTypes { get; } = new[] { MakeBlastDbType.Nucleotide, MakeBlastDbType.Protein };
 
         public MakeBlastDbType DbType
         {
-            get { return dbType; }
+            get => dbType;
             set
             {
                 dbType = value;
@@ -86,12 +84,14 @@ namespace LocalBlast
             }
         }
 
-        public ObservableCollection<string> StdOut => stdout;
+        public ObservableCollection<string> StdOut { get; } = new ObservableCollection<string>();
 
-        public void BrowseInputFile(object parameter)
+        public void BrowseInputFile(object? parameter)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Filter = "All Files|*.*";
+            var dlg = new OpenFileDialog
+            {
+                Filter = "All Files|*.*"
+            };
 
             if (dlg.ShowDialog() == true)
             {
@@ -99,10 +99,12 @@ namespace LocalBlast
             }
         }
 
-        public void BrowseOutputFile(object parameter)
+        public void BrowseOutputFile(object? parameter)
         {
-            var dlg = new SaveFileDialog();
-            dlg.Filter = "All Files|*";
+            var dlg = new SaveFileDialog
+            {
+                Filter = "All Files|*"
+            };
 
             if (!string.IsNullOrWhiteSpace(Output))
                 dlg.FileName = Output;
@@ -113,23 +115,25 @@ namespace LocalBlast
             }
         }
 
-        public async void Run(object parameter)
+        public async void Run(object? parameter)
         {
             State = PageState.Running;
             running = true;
             RunCommand.OnCanExecuteChanged();
             StdOut.Clear();
 
-            string workdir = Path.GetDirectoryName(Output);
+            string? workdir = Path.GetDirectoryName(Output);
 
-            if (!Directory.Exists(workdir))
+            if (!Directory.Exists(workdir) && workdir != null)
                 Directory.CreateDirectory(workdir);
 
-            var psi = new ProcessStartInfo(MakeBlastDbPath);
-            psi.Arguments = "-dbtype \"" + (DbType == MakeBlastDbType.Protein ? "prot" : "nucl") + "\" -in \"" + Input + "\" -out \"" + Output + "\"";
-            psi.UseShellExecute = false;
-            psi.RedirectStandardOutput = true;
-            psi.CreateNoWindow = true;
+            var psi = new ProcessStartInfo(MakeBlastDbPath)
+            {
+                Arguments = "-dbtype \"" + (DbType == MakeBlastDbType.Protein ? "prot" : "nucl") + "\" -in \"" + Input + "\" -out \"" + Output + "\"",
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                CreateNoWindow = true
+            };
 
             using (cts = new CancellationTokenSource())
             {
@@ -146,7 +150,8 @@ namespace LocalBlast
                 { }
 
                 if (cts != null && !cts.IsCancellationRequested && task.IsCompleted && task.Result == 0 && 
-                    File.Exists(Output + (DbType == MakeBlastDbType.Protein ? ".psq" : ".nsq")))
+                    (File.Exists(Output + (DbType == MakeBlastDbType.Protein ? ".psq" : ".nsq")) 
+                    || File.Exists(Output + (DbType == MakeBlastDbType.Protein ? ".pal" : ".nal"))))
                 {
                     State = PageState.Completed;
                 }
@@ -160,7 +165,7 @@ namespace LocalBlast
             RunCommand.OnCanExecuteChanged();
         }
 
-        private Task<int> RunMakeBlastDb(ProcessStartInfo psi, CancellationToken ct, IProgress<string> progress)
+        private static Task<int> RunMakeBlastDb(ProcessStartInfo psi, CancellationToken ct, IProgress<string> progress)
         {
             var tcs = new TaskCompletionSource<int>();
             var proc = new Process();
@@ -197,17 +202,17 @@ namespace LocalBlast
             return tcs.Task;
         }
 
-        public bool CanRun(object parameter) => !running && File.Exists(input);
+        public bool CanRun(object? parameter) => !running && File.Exists(input);
 
-        public void Cancel(object parameter)
+        public void Cancel(object? parameter)
         {
             cts?.Cancel();
             State = PageState.Error;
         }
 
-        public bool CanCancel(object parameter) => cts != null && !cts.IsCancellationRequested;
+        public bool CanCancel(object? parameter) => cts != null && !cts.IsCancellationRequested;
 
-        public void Close(object parameter)
+        public void Close(object? parameter)
         {
             if (cts != null)
             {

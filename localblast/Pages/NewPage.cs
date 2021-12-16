@@ -9,15 +9,14 @@ namespace LocalBlast
 {
 	public class NewPage : TabPage
 	{
-        private string blastnDatabasePath = Settings.Default.BlastnDbPath;
-        private string blastpDatabasePath = Settings.Default.BlastpDbPath;
-
-		public NewPage(MainViewModel owner)
+        public NewPage(MainViewModel owner)
 			: base(owner)
 		{
 			Header = "New job";
 
             BrowseBlastBinDirCommand = new DelegateCommand(BrowseBlastBinDir);
+            BrowseWorkingDirCommand = new DelegateCommand(BrowseWorkingDir);
+
             OpenMakeBlastDbCommand = new DelegateCommand(OpenMakeBlastDb, CanOpenMakeBlastDb);
 
             BrowseBlastnDbCommand = new DelegateCommand(BrowseBlastnDb);
@@ -28,10 +27,16 @@ namespace LocalBlast
 			OpenBlastpCommand = new DelegateCommand(OpenBlastp, CanOpenBlastp);
 			OpenAlginBlastpCommand = new DelegateCommand(OpenAlignBlastp, CanOpenBlastp);
 
-			CloseCommand = new DelegateCommand(null, _ => false);
+            BrowseBlastxDbCommand = new DelegateCommand(BrowseBlastxDb);
+            OpenBlastxCommand = new DelegateCommand(OpenBlastx, CanOpenBlastx);
+            OpenAlginBlastxCommand = new DelegateCommand(OpenAlignBlastx, CanOpenBlastx);
+
+            CloseCommand = new DelegateCommand(null, _ => false);
 		}
 
         public DelegateCommand BrowseBlastBinDirCommand { get; }
+        public DelegateCommand BrowseWorkingDirCommand { get; }
+
         public DelegateCommand OpenMakeBlastDbCommand { get; }
 
         public DelegateCommand BrowseBlastnDbCommand { get; }
@@ -42,38 +47,52 @@ namespace LocalBlast
 		public DelegateCommand OpenBlastpCommand { get; }
 		public DelegateCommand OpenAlginBlastpCommand { get; }
 
+        public DelegateCommand BrowseBlastxDbCommand { get; }
+        public DelegateCommand OpenBlastxCommand { get; }
+        public DelegateCommand OpenAlginBlastxCommand { get; }
+
         public override DelegateCommand CloseCommand { get; }
 
         public string BlastnDbPath
         {
-            get { return blastnDatabasePath; }
+            get => Settings.Default.BlastnDbPath;
             set
             {
-                blastnDatabasePath = value;
                 Settings.Default.BlastnDbPath = value;
                 OnPropertyChanged();
             }
         }
 
         public string BlastpDbPath
-		{
-			get { return blastpDatabasePath; }
-			set
-			{
-				blastpDatabasePath = value;
-				Settings.Default.BlastpDbPath = value;
-				OnPropertyChanged();
-			}
+        {
+            get => Settings.Default.BlastpDbPath;
+            set
+            {
+                Settings.Default.BlastpDbPath = value;
+                OnPropertyChanged();
+            }
         }
 
-        public void BrowseBlastBinDir(object parameter)
+        public string BlastxDbPath
+        {
+            get => Settings.Default.BlastxDbPath;
+            set
+            {
+                Settings.Default.BlastxDbPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public static int ProcessorCount => Environment.ProcessorCount;
+
+        public void BrowseBlastBinDir(object? parameter)
         {
             using (var dlg = new CommonOpenFileDialog())
             {
                 dlg.IsFolderPicker = true;
 
                 if (parameter is string defaultDir && Directory.Exists(defaultDir))
-                    dlg.DefaultDirectory = defaultDir;
+                    dlg.InitialDirectory = defaultDir;
 
                 if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
                 {
@@ -86,21 +105,42 @@ namespace LocalBlast
             }
         }
 
-        public void OpenMakeBlastDb(object parameter)
+        public void BrowseWorkingDir(object? parameter)
         {
-            var page = new MakeBlastDbPage(Owner);
-            page.MakeBlastDbPath = Path.Combine(Owner.BlastBinDir, "makeblastdb.exe");
+            using (var dlg = new CommonOpenFileDialog())
+            {
+                dlg.IsFolderPicker = true;
+
+                if (parameter is string defaultDir && Directory.Exists(defaultDir))
+                    dlg.InitialDirectory = defaultDir;
+
+                if (dlg.ShowDialog() == CommonFileDialogResult.Ok)
+                    Owner.WorkingDirectory = dlg.FileName;
+            }
+        }
+
+        public void OpenMakeBlastDb(object? parameter)
+        {
+            var page = new MakeBlastDbPage(Owner)
+            {
+                MakeBlastDbPath = Path.Combine(Owner.BlastBinDir, "makeblastdb.exe")
+            };
 
             Owner.Tabs.Add(page);
             Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
         }
 
-        public bool CanOpenMakeBlastDb(object parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "makeblastdb.exe"));
+        public bool CanOpenMakeBlastDb(object? parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "makeblastdb.exe"));
 
-        public void BrowseBlastnDb(object parameter)
+        public void BrowseBlastnDb(object? parameter)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Filter = "blastn sequence file (*.nsq)|*.nsq";
+            var dlg = new OpenFileDialog
+            {
+                Filter = BlastnPage.DbFileTypeFilter
+            };
+
+            if (File.Exists(BlastnDbPath))
+                dlg.InitialDirectory = Path.GetDirectoryName(BlastnDbPath);
 
             if (dlg.ShowDialog() == true)
             {
@@ -110,50 +150,159 @@ namespace LocalBlast
             }
         }
 
-        public void OpenBlastn(object parameter)
+        public void OpenBlastn(object? parameter)
         {
-            var page = new BlastnPage(Owner);
-			page.ExePath = Path.Combine(Owner.BlastBinDir, "blastn.exe");
-            page.DbPath = BlastnDbPath.Substring(0, BlastnDbPath.Length - 4);
+            var page = new BlastnPage(Owner)
+            {
+                ExePath = Path.Combine(Owner.BlastBinDir, "blastn.exe"),
+                DbPath = BlastnDbPath[0..^4]
+            };
 
             Owner.Tabs.Add(page);
             Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
         }
 
-        public bool CanOpenBlastn(object parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastn.exe")) && File.Exists(BlastnDbPath);
-
-        public void OpenAlignBlastn(object parameter)
+        public void OpenAlignBlastn(object? parameter)
         {
-            var dlg = new OpenFileDialog();
-            dlg.Filter = "Alignment file(*.fa*)|*.fa*";
+            var owner = Owner;
+            string exePath = Path.Combine(Owner.BlastBinDir, "blastn.exe");
+            string dbPath = BlastnDbPath[0..^4];
+
+            OpenWithAlignment(() => new BlastnPage(owner)
+            {
+                ExePath = exePath,
+                DbPath = dbPath
+            });
+        }
+
+        public bool CanOpenBlastn(object? parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastn.exe")) && File.Exists(BlastnDbPath);
+
+        public void BrowseBlastpDb(object? parameter)
+		{
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal"
+            };
+
+            if (File.Exists(BlastpDbPath))
+                dlg.InitialDirectory = Path.GetDirectoryName(BlastpDbPath);
+
+            if (dlg.ShowDialog() == true)
+			{
+				BlastpDbPath = dlg.FileName;
+				OpenBlastpCommand.OnCanExecuteChanged();
+                OpenAlginBlastpCommand.OnCanExecuteChanged();
+            }
+		}
+
+		public void OpenBlastp(object? parameter)
+		{
+            var page = new BlastpPage(Owner)
+            {
+                ExePath = Path.Combine(Owner.BlastBinDir, "blastp.exe"),
+                DbPath = BlastpDbPath[0..^4]
+            };
+
+            Owner.Tabs.Add(page);
+			Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
+		}
+
+		public void OpenAlignBlastp(object? parameter)
+        {
+            var owner = Owner;
+            string exePath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
+            string dbPath = BlastpDbPath[0..^4];
+
+            OpenWithAlignment(() => new BlastpPage(owner)
+            {
+                ExePath = exePath,
+                DbPath = dbPath
+            });
+		}
+
+		public bool CanOpenBlastp(object? parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastp.exe")) && File.Exists(BlastpDbPath);
+
+        public void BrowseBlastxDb(object? parameter)
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal"
+            };
+
+            if (File.Exists(BlastxDbPath))
+                dlg.InitialDirectory = Path.GetDirectoryName(BlastxDbPath);
 
             if (dlg.ShowDialog() == true)
             {
-                string name = null;
+                BlastxDbPath = dlg.FileName;
+                OpenBlastxCommand.OnCanExecuteChanged();
+                OpenAlginBlastxCommand.OnCanExecuteChanged();
+            }
+        }
+
+        public void OpenBlastx(object? parameter)
+        {
+            var page = new BlastxPage(Owner)
+            {
+                ExePath = Path.Combine(Owner.BlastBinDir, "blastx.exe"),
+                DbPath = BlastxDbPath[0..^4]
+            };
+
+            Owner.Tabs.Add(page);
+            Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
+        }
+
+        public void OpenAlignBlastx(object? parameter)
+        {
+            var owner = Owner;
+            string exePath = Path.Combine(Owner.BlastBinDir, "blastx.exe");
+            string dbPath = BlastxDbPath[0..^4];
+
+            OpenWithAlignment(() => new BlastxPage(owner)
+            {
+                ExePath = exePath,
+                DbPath = dbPath
+            });
+        }
+
+        public bool CanOpenBlastx(object? parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastx.exe")) && File.Exists(BlastxDbPath);
+
+        private void OpenWithAlignment(Func<BlastPage> pageInitializer)
+        {
+            var dlg = new OpenFileDialog
+            {
+                Filter = "Alignment file(*.fa*)|*.fa*"
+            };
+
+            if (Directory.Exists(Settings.Default.SeqFileDir))
+                dlg.InitialDirectory = Settings.Default.SeqFileDir;
+
+            if (dlg.ShowDialog() == true)
+            {
+                string? name = null;
                 var lines = new List<string>();
                 int ncpu = Environment.ProcessorCount;
                 int concurrents = 0;
 
+                Settings.Default.SeqFileDir = Path.GetDirectoryName(dlg.FileName);
+
                 using (var sr = File.OpenText(dlg.FileName))
                 {
-                    string line = null;
+                    string? line = null;
                     bool added = false;
                     do
                     {
                         line = sr.ReadLine();
 
-                        if (line == null || line.StartsWith(">"))
+                        if (line == null || line.StartsWith('>'))
                         {
                             if (name != null)
                             {
-                                var page = new BlastnPage(Owner);
-                                page.ExePath = Path.Combine(Owner.BlastBinDir, "blastn.exe");
-                                page.DbPath = BlastnDbPath.Substring(0, BlastnDbPath.Length - 4);
+                                var blast = pageInitializer();
+                                blast.JobTitle = name;
+                                blast.Query = string.Join(Environment.NewLine, lines);
 
-                                page.JobTitle = name;
-                                page.Query = string.Join(Environment.NewLine, lines);
-
-                                if (page.CanRun(null))
+                                if (blast.CanRun(null))
                                 {
                                     if (++concurrents > ncpu)
                                     {
@@ -164,10 +313,10 @@ namespace LocalBlast
                                         }
                                     }
 
-                                    page.Run(null);
+                                    blast.Run(null);
                                 }
 
-                                Owner.Tabs.Add(page);
+                                Owner.Tabs.Add(blast);
 
                                 if (!added)
                                 {
@@ -175,7 +324,7 @@ namespace LocalBlast
                                     added = true;
                                 }
                             }
-                            name = line?.Substring(1);
+                            name = line?[1..];
                             lines.Clear();
                         }
                         else
@@ -185,94 +334,5 @@ namespace LocalBlast
                 }
             }
         }
-
-        public void BrowseBlastpDb(object parameter)
-		{
-			var dlg = new OpenFileDialog();
-			dlg.Filter = "blastp sequence file (*.psq)|*.psq";
-
-			if (dlg.ShowDialog() == true)
-			{
-				BlastpDbPath = dlg.FileName;
-				OpenBlastpCommand.OnCanExecuteChanged();
-                OpenAlginBlastpCommand.OnCanExecuteChanged();
-            }
-		}
-
-		public void OpenBlastp(object parameter)
-		{
-			var page = new BlastpPage(Owner);
-			page.ExePath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
-			page.DbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
-
-			Owner.Tabs.Add(page);
-			Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
-		}
-
-		public void OpenAlignBlastp(object parameter)
-		{
-			var dlg = new OpenFileDialog();
-			dlg.Filter = "Alignment file(*.fa*)|*.fa*";
-
-			if (dlg.ShowDialog() == true)
-			{
-				string name = null;
-				var lines = new List<string>();
-                int ncpu = Environment.ProcessorCount;
-                int concurrents = 0;
-
-				using (var sr = File.OpenText(dlg.FileName))
-				{
-					string line = null;
-					bool added = false;
-					do
-					{
-						line = sr.ReadLine();
-
-						if (line == null || line.StartsWith(">"))
-						{
-							if (name != null)
-							{
-								var blastp = new BlastpPage(Owner);
-								blastp.ExePath = Path.Combine(Owner.BlastBinDir, "blastp.exe");
-								blastp.DbPath = BlastpDbPath.Substring(0, BlastpDbPath.Length - 4);
-
-								blastp.JobTitle = name;
-								blastp.Query = string.Join(Environment.NewLine, lines);
-
-								if (blastp.CanRun(null))
-                                {
-                                    if (++concurrents > ncpu)
-                                    {
-                                        if (MessageBox.Show("The alignment contains " + concurrents + "+ sequences. Continue?", 
-                                            "Local BLAST", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                                        {
-                                            break;
-                                        }
-                                    }
-
-                                    blastp.Run(null);
-                                }
-
-								Owner.Tabs.Add(blastp);
-
-								if (!added)
-								{
-									Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
-									added = true;
-								}
-							}
-							name = line?.Substring(1);
-							lines.Clear();
-						}
-						else
-							lines.Add(line);
-					}
-					while (line != null);
-				}
-			}
-		}
-
-		public bool CanOpenBlastp(object parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastp.exe")) && File.Exists(BlastpDbPath);
-	}
+    }
 }

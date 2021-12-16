@@ -11,14 +11,14 @@ namespace LocalBlast
         public Hit(TabPage owner, XNamespace ns, XElement hitElement, int queryLength)
         {
             Parent = owner;
-            Index = (int)hitElement.Element(ns + "num");
+            Index = (int?)hitElement.Element(ns + "num") ?? 0;
 
             var hitDescr = hitElement.Descendants(ns + "HitDescr").FirstOrDefault();
-            Id = (string)hitDescr?.Element(ns + "id");
-            Accession = (string)hitDescr?.Element(ns + "accession");
-            Title = (string)hitDescr?.Element(ns + "title");
+            Id = (string?)hitDescr?.Element(ns + "id");
+            Accession = (string?)hitDescr?.Element(ns + "accession");
+            Title = (string?)hitDescr?.Element(ns + "title");
 
-            Length = (int)hitElement.Element(ns + "len");
+            Length = (int?)hitElement.Element(ns + "len") ?? 0;
 
             Segments = new List<SegmentPair>();
 
@@ -32,16 +32,21 @@ namespace LocalBlast
                 var value = new SegmentPair(this, hsp, ns);
                 Segments.Add(value);
 
-                queryLoc.UnionWith(new Span(value.QueryFrom, value.QueryTo));
-                hitLoc.UnionWith(new Span(value.HitFrom, value.HitTo));
+                var querySpan = new SeqSpan(value.QueryFrom, value.QueryTo);
+
+                if (!queryLoc.IsSupersetOf(querySpan))
+                    value.IsVisible = true;
+
+                queryLoc.UnionWith(querySpan);
+                hitLoc.UnionWith(new SeqSpan(value.HitFrom, value.HitTo));
 
                 bitScore = Math.Max(bitScore, value.BitScore);
                 minEValue = Math.Min(minEValue, value.EValue);
             }
             MaxBitScore = bitScore;
             MinEValue = minEValue;
-            QueryCover = (double)queryLoc.TotalLength / queryLength;
-            HitCover = (double)hitLoc.TotalLength / Length;
+            QueryCover = TruncateRatio(queryLoc.TotalLength, queryLength);
+            HitCover = TruncateRatio(hitLoc.TotalLength, Length);
             QueryFrom = queryLoc.From;
             QueryTo = queryLoc.To;
         }
@@ -50,11 +55,11 @@ namespace LocalBlast
 
         public int Index { get; }
 
-        public string Id { get; }
+        public string? Id { get; }
 
-        public string Accession { get; }
+        public string? Accession { get; }
 
-        public string Title { get; }
+        public string? Title { get; }
 
         public int Length { get; }
 
@@ -72,6 +77,8 @@ namespace LocalBlast
         public int QueryFrom { get; }
 
         public int QueryTo { get; }
+
+        public static double TruncateRatio(long numerator, long denominator) => (numerator * 100 / denominator) / 100.0;
     }
 
     public class SegmentPair
@@ -79,52 +86,77 @@ namespace LocalBlast
         public SegmentPair(Hit owner, XElement hspElement, XNamespace ns)
         {
             Parent = owner;
-            Index = (int)hspElement.Element(ns + "num");
-            BitScore = (double)hspElement.Element(ns + "bit-score");
-            Score = (int)hspElement.Element(ns + "score");
-            EValue = (double)hspElement.Element(ns + "evalue");
-            Identity = (int)hspElement.Element(ns + "identity");
+            Index = (int?)hspElement.Element(ns + "num") ?? 0;
+            BitScore = (double?)hspElement.Element(ns + "bit-score") ?? 0;
+            Score = (int?)hspElement.Element(ns + "score") ?? 0;
+            EValue = (double?)hspElement.Element(ns + "evalue") ?? 1;
+            Identity = (int?)hspElement.Element(ns + "identity") ?? 0;
             Positive = (int?)hspElement.Element(ns + "positive") ?? 0;
-            QueryFrom = (int)hspElement.Element(ns + "query-from");
-            QueryTo = (int)hspElement.Element(ns + "query-to");
-            QueryStrand = (string)hspElement.Element(ns + "query-strand");
-            HitFrom = (int)hspElement.Element(ns + "hit-from");
-            HitTo = (int)hspElement.Element(ns + "hit-to");
-            HitStrand = (string)hspElement.Element(ns + "hit-strand");
-            AlignLength = (int)hspElement.Element(ns + "align-len");
-            Gaps = (int)hspElement.Element(ns + "gaps");
-            QuerySeq = (string)hspElement.Element(ns + "qseq");
-            HitSeq = (string)hspElement.Element(ns + "hseq");
-            Alignment = (string)hspElement.Element(ns + "midline");
+            QueryFrom = (int?)hspElement.Element(ns + "query-from") ?? 0;
+            QueryTo = (int?)hspElement.Element(ns + "query-to") ?? 0;
+            QueryStrand = (string?)hspElement.Element(ns + "query-strand");
+            QueryFrame = (string?)hspElement.Element(ns + "query-frame");
+            HitFrom = (int?)hspElement.Element(ns + "hit-from") ?? 0;
+            HitTo = (int?)hspElement.Element(ns + "hit-to") ?? 0;
+            HitStrand = (string?)hspElement.Element(ns + "hit-strand");
+            HitFrame = (string?)hspElement.Element(ns + "hit-frame");
+            AlignLength = (int?)hspElement.Element(ns + "align-len") ?? 0;
+            Gaps = (int?)hspElement.Element(ns + "gaps") ?? 0;
+            QuerySeq = (string?)hspElement.Element(ns + "qseq");
+            HitSeq = (string?)hspElement.Element(ns + "hseq");
+            Alignment = (string?)hspElement.Element(ns + "midline");
+
+            if (QueryFrame != null && !QueryFrame.StartsWith('-'))
+                QueryFrame = "+" + QueryFrame;
+
+            if (HitFrame != null && !HitFrame.StartsWith('-'))
+                HitFrame = "+" + HitFrame;
 
             var sb = new StringBuilder(AlignLength + 10);
 
             if (QuerySeq != null)
-            {
-                for (int seqPos = 0, queryPos = QueryFrom - 1; seqPos < QuerySeq.Length; seqPos++)
-                {
-                    if (QuerySeq[seqPos] != '-')
-                        queryPos++;
-
-                    if (sb.Length == seqPos)
-                        sb.Append(queryPos % 100 == 1 ? "|" + queryPos : " ");
-                }
-                QueryScaleMark = sb.ToString();
-                sb.Clear();
-            }
+                QueryScaleMark = CreateScaleMark(sb, QuerySeq, QueryFrom, QueryTo, QueryStrand, QueryFrame);
 
             if (HitSeq != null)
-            {
-                for (int seqPos = 0, hitPos = HitFrom - 1; seqPos < HitSeq.Length; seqPos++)
-                {
-                    if (HitSeq[seqPos] != '-')
-                        hitPos++;
+                HitScaleMark = CreateScaleMark(sb, HitSeq, HitFrom, HitTo, HitStrand, HitFrame);
 
-                    if (sb.Length == seqPos)
-                        sb.Append(hitPos % 100 == 1 ? "|" + hitPos : " ");
+            string CreateScaleMark(StringBuilder buffer, string alignment, int from, int to, string? strand, string? frame)
+            {
+                buffer.Clear();
+
+                int incr = 1;
+                int seqPos = from - 1;
+
+                if (strand == "Minus")
+                {
+                    incr = -1;
+                    seqPos = from + 1;
                 }
-                HitScaleMark = sb.ToString();
-                sb.Clear();
+                else if (frame != null)
+                {
+                    //int frameValue = int.Parse(frame);
+
+                    if (frame.StartsWith('+'))
+                    {
+                        incr = 3;
+                        seqPos = from - 3;
+                    }
+                    else
+                    {
+                        incr = -3;
+                        seqPos = to + 3;
+                    }
+                }
+
+                for (int alignPos = 0; alignPos < alignment.Length; alignPos++)
+                {
+                    if (alignment[alignPos] != '-')
+                        seqPos += incr;
+
+                    if (sb.Length == alignPos)
+                        buffer.Append(seqPos % 100 == 1 ? "|" + seqPos : " ");
+                }
+                return buffer.ToString();
             }
         }
 
@@ -148,32 +180,36 @@ namespace LocalBlast
 
         public int QueryTo { get; }
 
-        public string QueryStrand { get; }
+        public string? QueryStrand { get; }
+
+        public string? QueryFrame { get; }
 
         public int HitFrom { get; }
 
         public int HitTo { get; }
 
-        public string HitStrand { get; }
+        public string? HitStrand { get; }
+
+        public string? HitFrame { get; }
 
         public int AlignLength { get; }
 
-        public string QuerySeq { get; }
+        public string? QuerySeq { get; }
 
-        public string HitSeq { get; }
+        public string? HitSeq { get; }
 
-        public string Alignment { get; }
+        public string? Alignment { get; }
 
-        public string QueryScaleMark { get; }
+        public string? QueryScaleMark { get; }
 
-        public string HitScaleMark { get; }
+        public string? HitScaleMark { get; }
 
         // for view
         public int ZIndex => -Index;
 
         public int QueryWidth => QueryTo - QueryFrom + 1;
 
-        public double IdentityRatio => (double)Identity / AlignLength;
+        public double IdentityRatio => Hit.TruncateRatio(Identity, AlignLength);
 
         public int BitScoreLevel
         {
@@ -194,5 +230,7 @@ namespace LocalBlast
                 return 4;
             }
         }
+
+        public bool IsVisible { get; set; }
     }
 }
