@@ -28,6 +28,7 @@ namespace LocalBlast
         private int queryLength;
         private string? message;
         private List<Hit>? hits;
+        private ObservableHeadCollection<Hit>? hitsView;
         private Hit? selectedHit;
         private SegmentPair? selectedSegment;
         private double zoomLevel = 1;
@@ -40,6 +41,8 @@ namespace LocalBlast
             RunCommand = new DelegateCommand(Run, CanRun);
             CancelCommand = new DelegateCommand(Cancel, CanCancel);
             LoadSequenceCommand = new DelegateCommand(LoadSequence, CanLoadSequence);
+            ViewMoreHitsCommand = new DelegateCommand(ViewMoreHits, CanViewMoreHits);
+            ViewAllHitsCommand = new DelegateCommand(ViewAllHits, CanViewMoreHits);
             PreviousHitCommand = new DelegateCommand(PreviousHit, CanPreviousHit);
             NextHitCommand = new DelegateCommand(NextHit, CanNextHit);
             PreviousSegmentPairCommand = new DelegateCommand(PreviousSegmentPair, CanPreviousSegmentPair);
@@ -51,6 +54,8 @@ namespace LocalBlast
         public DelegateCommand RunCommand { get; }
         public DelegateCommand CancelCommand { get; }
         public DelegateCommand LoadSequenceCommand { get; }
+        public DelegateCommand ViewMoreHitsCommand { get; }
+        public DelegateCommand ViewAllHitsCommand { get; }
         public DelegateCommand PreviousHitCommand { get; }
         public DelegateCommand NextHitCommand { get; }
         public DelegateCommand PreviousSegmentPairCommand { get; }
@@ -181,13 +186,22 @@ namespace LocalBlast
             }
         }
 
-        public List<Hit>? Hits
+        public int TotalHits => hits == null ? 0 : hits.Count;
+
+        public ObservableHeadCollection<Hit>? Hits
         {
-            get => hits;
+            get => hitsView;
             set
             {
-                hits = value;
+                hitsView = value;
+
+                if (value == null)
+                    hits = null;
+
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(TotalHits));
+                ViewMoreHitsCommand.OnCanExecuteChanged();
+                ViewAllHitsCommand.OnCanExecuteChanged();
             }
         }
 
@@ -344,7 +358,7 @@ namespace LocalBlast
 
                 if (cts != null && !cts.IsCancellationRequested && task.IsCompleted && task.Result == 0 && File.Exists(outPath))
                 {
-                    Hits = await Task.Run(() =>
+                    hits = await Task.Run(() =>
                     {
                         var hits = new List<Hit>();
 
@@ -368,6 +382,7 @@ namespace LocalBlast
                         return hits;
                     });
 
+                    Hits = new ObservableHeadCollection<Hit>(hits, Math.Min(TotalHits, Owner.InitialBlastHitsView));
                     State = PageState.Completed;
                 }
                 else
@@ -436,6 +451,27 @@ namespace LocalBlast
         public bool CanCancel(object? parameter)
         {
             return cts != null && !cts.IsCancellationRequested;
+        }
+
+        public void ViewMoreHits(object? parameter)
+        {
+            Hits!.ViewMoreItems(Owner.InitialBlastHitsView);
+            ViewMoreHitsCommand.OnCanExecuteChanged();
+            ViewAllHitsCommand.OnCanExecuteChanged();
+            NextHitCommand.OnCanExecuteChanged();
+        }
+
+        public bool CanViewMoreHits(object? parameter)
+        {
+            return Hits != null && Hits.Count < TotalHits;
+        }
+
+        public void ViewAllHits(object? parameter)
+        {
+            Hits!.ViewAllItems();
+            ViewMoreHitsCommand.OnCanExecuteChanged();
+            ViewAllHitsCommand.OnCanExecuteChanged();
+            NextHitCommand.OnCanExecuteChanged();
         }
 
         public void PreviousHit(object? parameter)
@@ -507,9 +543,6 @@ namespace LocalBlast
                 cts = null;
             }
             Owner.Tabs.Remove(this);
-
-            SelectedHit = null;
-            Hits = null;
         }
 
         protected virtual void SetArgument(Dictionary<string, string> arglist)

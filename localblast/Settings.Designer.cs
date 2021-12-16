@@ -346,5 +346,29 @@ namespace LocalBlast {
                 this["WorkingDirectory"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool LimitsBlastHitsView {
+            get {
+                return ((bool)(this["LimitsBlastHitsView"]));
+            }
+            set {
+                this["LimitsBlastHitsView"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        public int InitialBlastHitsView {
+            get {
+                return ((int)(this["InitialBlastHitsView"]));
+            }
+            set {
+                this["InitialBlastHitsView"] = value;
+            }
+        }
     }
 }

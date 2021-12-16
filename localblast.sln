@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "localblast", "localblast\localblast.csproj", "{EBF8EDB3-98B7-45F4-9BD3-6DD7D937DE50}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "localblast", "localblast\localblast.csproj", "{EBF8EDB3-98B7-45F4-9BD3-6DD7D937DE50}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{BC495668-A8B7-472C-8BA1-62380A13A13E}"
 	ProjectSection(SolutionItems) = preProject
