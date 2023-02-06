@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace LocalBlast
 {
-	public struct SeqSpan : IEquatable<SeqSpan>, IComparable<SeqSpan>
+	public readonly struct SeqSpan : IEquatable<SeqSpan>, IComparable<SeqSpan>
 	{
 		public SeqSpan(int from, int to)
 		{
@@ -40,7 +40,7 @@ namespace LocalBlast
 		public static SeqSpan Intersect(SeqSpan one, SeqSpan other)
 		{
 			if (!one.Overlaps(other))
-				throw new ArgumentException();
+				throw new InvalidOperationException();
 
 			return new SeqSpan(Math.Max(one.From, other.From), Math.Min(one.To, other.To));
 		}
@@ -51,7 +51,7 @@ namespace LocalBlast
 			return (fromComp != 0) ? fromComp : other.To.CompareTo(To);
 		}
 
-		public override int GetHashCode() => ((From & 0xffff) << 16) + (To & 0xffff);
+		public override int GetHashCode() => HashCode.Combine(From, To);
 
 		public override string ToString() => From == To ? From.ToString() : From + ".." + To;
 
@@ -87,12 +87,10 @@ namespace LocalBlast
 			{
 				int length = 0;
 
-				if (segments != null)
-				{
-					foreach (var span in segments)
-						length += span.Length;
-				}
-				return length;
+                foreach (var span in segments)
+                    length += span.Length;
+
+                return length;
 			}
 		}
 
@@ -103,7 +101,7 @@ namespace LocalBlast
 				if (NumberOfSegments == 0)
 					throw new InvalidOperationException();
 
-				return segments.First.Value.From;
+				return segments.First!.Value.From;
 			}
 		}
 
@@ -114,7 +112,7 @@ namespace LocalBlast
 				if (NumberOfSegments == 0)
 					throw new InvalidOperationException();
 
-				return segments.Last.Value.To;
+				return segments.Last!.Value.To;
 			}
 		}
 
@@ -186,9 +184,6 @@ namespace LocalBlast
 
 		public void IntersectWith(Location location)
 		{
-			if (location == null)
-				throw new ArgumentNullException(nameof(location));
-
 			if (NumberOfSegments == 0)
 				return;
 
@@ -234,7 +229,7 @@ namespace LocalBlast
 				}
 				else
 				{
-					var prevNode = node.Previous;
+					var prevNode = node.Previous!;
 
 					if (CanUnion(prevNode.Value, node.Value))
 					{
@@ -257,7 +252,7 @@ namespace LocalBlast
 				return "NumberOfSegments = 0";
 
 			if (NumberOfSegments == 1)
-				return segments.First.ToString();
+				return segments.First!.ValueRef.ToString();
 
 			return "join(" + string.Join(",", segments) + ")";
 		}

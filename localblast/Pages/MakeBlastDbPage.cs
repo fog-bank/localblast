@@ -56,8 +56,13 @@ namespace LocalBlast
                 OnPropertyChanged();
 
                 if (string.IsNullOrEmpty(Output) && value != null)
-                    Output = Path.Combine(Path.GetDirectoryName(value), Path.GetFileNameWithoutExtension(value));
+                {
+                    string? path1 = Path.GetDirectoryName(value);
+                    string? path2 = Path.GetFileNameWithoutExtension(value);
 
+                    if (path1 != null && path2 != null)
+                        Output = Path.Combine(path1, path2);
+                }
                 RunCommand.OnCanExecuteChanged();
             }
         }
@@ -127,7 +132,7 @@ namespace LocalBlast
             if (!Directory.Exists(workdir) && workdir != null)
                 Directory.CreateDirectory(workdir);
 
-            var psi = new ProcessStartInfo(MakeBlastDbPath)
+            var psi = new ProcessStartInfo(MakeBlastDbPath!)
             {
                 Arguments = "-dbtype \"" + (DbType == MakeBlastDbType.Protein ? "prot" : "nucl") + "\" -in \"" + Input + "\" -out \"" + Output + "\"",
                 UseShellExecute = false,
@@ -202,7 +207,7 @@ namespace LocalBlast
             return tcs.Task;
         }
 
-        public bool CanRun(object? parameter) => !running && File.Exists(input);
+        public bool CanRun(object? parameter) => !running && File.Exists(MakeBlastDbPath) && File.Exists(input);
 
         public void Cancel(object? parameter)
         {

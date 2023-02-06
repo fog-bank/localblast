@@ -345,7 +345,7 @@ namespace LocalBlast
 
             sb.Length--;
 
-            var psi = new ProcessStartInfo(ExePath)
+            var psi = new ProcessStartInfo(ExePath!)
             {
                 Arguments = sb.ToString(),
                 UseShellExecute = false,
@@ -447,7 +447,7 @@ namespace LocalBlast
 
         public bool CanRun(object? parameter)
         {
-            return !running && !string.IsNullOrWhiteSpace(Query);
+            return !running && !string.IsNullOrWhiteSpace(Query) && File.Exists(ExePath);
         }
 
         public void Cancel(object? parameter)
