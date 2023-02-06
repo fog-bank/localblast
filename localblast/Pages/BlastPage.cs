@@ -41,6 +41,7 @@ namespace LocalBlast
             RunCommand = new DelegateCommand(Run, CanRun);
             CancelCommand = new DelegateCommand(Cancel, CanCancel);
             LoadSequenceCommand = new DelegateCommand(LoadSequence, CanLoadSequence);
+            FromClipboardCommand = new DelegateCommand(FromClipboard);
             ViewMoreHitsCommand = new DelegateCommand(ViewMoreHits, CanViewMoreHits);
             ViewAllHitsCommand = new DelegateCommand(ViewAllHits, CanViewMoreHits);
             PreviousHitCommand = new DelegateCommand(PreviousHit, CanPreviousHit);
@@ -54,6 +55,7 @@ namespace LocalBlast
         public DelegateCommand RunCommand { get; }
         public DelegateCommand CancelCommand { get; }
         public DelegateCommand LoadSequenceCommand { get; }
+        public DelegateCommand FromClipboardCommand { get; }
         public DelegateCommand ViewMoreHitsCommand { get; }
         public DelegateCommand ViewAllHitsCommand { get; }
         public DelegateCommand PreviousHitCommand { get; }
@@ -300,6 +302,12 @@ namespace LocalBlast
         }
 
         public bool CanLoadSequence(object? parameter) => !running;
+
+        public void FromClipboard(object? parameter)
+        {
+            if (Clipboard.ContainsText(TextDataFormat.Text))
+                Query = Clipboard.GetText(TextDataFormat.Text);
+        }
 
         public async void Run(object? parameter)
         {

@@ -177,7 +177,7 @@
                             </StackPanel>
                             <StackPanel Margin="0,4" Orientation="Horizontal">
                                 <CheckBox IsChecked="{Binding Owner.LimitsBlastHitsView}"
-                                          VerticalAlignment="Center">Limits the number of alignment to show:</CheckBox>
+                                          VerticalAlignment="Center">Limits the number of alignments shown first:</CheckBox>
                                 <ComboBox Margin="8,0" VerticalAlignment="Center" SelectedValue="{Binding Owner.InitialBlastHitsView}">
                                     <clr:Int32>10</clr:Int32>
                                     <clr:Int32>20</clr:Int32>
@@ -340,7 +340,13 @@
                                         </StackPanel>
                                     </StackPanel>
                                 </Expander>
-                                <Expander Header="Query sequence">
+                                <Expander>
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
+                                            <Button Margin="8,0" Command="{Binding FromClipboardCommand}">Paste from clipboard</Button>
+                                        </StackPanel>
+                                    </Expander.Header>
                                     <TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
 										 Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
                                 </Expander>
@@ -550,7 +556,13 @@
                                     <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
                                 </StackPanel>
                                 <!--<Expander Header="Parameters" Margin="0,4" />-->
-                                <Expander Header="Query sequence">
+                                <Expander>
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
+                                            <Button Margin="8,0" Command="{Binding FromClipboardCommand}">Paste from clipboard</Button>
+                                        </StackPanel>
+                                    </Expander.Header>
                                     <TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
                                              Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
                                 </Expander>
@@ -764,7 +776,13 @@
                                         </StackPanel>
                                     </StackPanel>
                                 </Expander>
-                                <Expander Header="Query sequence">
+                                <Expander>
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
+                                            <Button Margin="8,0" Command="{Binding FromClipboardCommand}">Paste from clipboard</Button>
+                                        </StackPanel>
+                                    </Expander.Header>
                                     <TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
                                              Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
                                 </Expander>
@@ -971,7 +989,13 @@
                                     <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
                                 </StackPanel>
                                 <!--<Expander Header="Parameters" Margin="0,4" />-->
-                                <Expander Header="Query sequence">
+                                <Expander>
+                                    <Expander.Header>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock VerticalAlignment="Center">Query sequence</TextBlock>
+                                            <Button Margin="8,0" Command="{Binding FromClipboardCommand}">Paste from clipboard</Button>
+                                        </StackPanel>
+                                    </Expander.Header>
                                     <TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
                                              Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
                                 </Expander>
