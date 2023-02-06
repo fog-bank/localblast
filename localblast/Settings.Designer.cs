@@ -12,7 +12,7 @@ namespace LocalBlast {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.0.3.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("Microsoft.VisualStudio.Editors.SettingsDesigner.SettingsSingleFileGenerator", "17.4.0.0")]
     internal sealed partial class Settings : global::System.Configuration.ApplicationSettingsBase {
         
         private static Settings defaultInstance = ((Settings)(global::System.Configuration.ApplicationSettingsBase.Synchronized(new Settings())));
@@ -368,6 +368,54 @@ namespace LocalBlast {
             }
             set {
                 this["InitialBlastHitsView"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string TblastnQueryPaneHeight {
+            get {
+                return ((string)(this["TblastnQueryPaneHeight"]));
+            }
+            set {
+                this["TblastnQueryPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string TblastnResultPaneHeight {
+            get {
+                return ((string)(this["TblastnResultPaneHeight"]));
+            }
+            set {
+                this["TblastnResultPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("*")]
+        public string TblastnDescPaneHeight {
+            get {
+                return ((string)(this["TblastnDescPaneHeight"]));
+            }
+            set {
+                this["TblastnDescPaneHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string TblastnDbPath {
+            get {
+                return ((string)(this["TblastnDbPath"]));
+            }
+            set {
+                this["TblastnDbPath"] = value;
             }
         }
     }

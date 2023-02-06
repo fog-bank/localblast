@@ -8,7 +8,10 @@ using Microsoft.WindowsAPICodePack.Dialogs;
 namespace LocalBlast
 {
 	public class NewPage : TabPage
-	{
+    {
+        private const string NuclDbFilter = "Nucleotide sequence file (*.nsq;*.nal)|*.nsq;*.nal";
+        private const string ProtDbFilter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal";
+
         public NewPage(MainViewModel owner)
 			: base(owner)
 		{
@@ -31,6 +34,10 @@ namespace LocalBlast
             OpenBlastxCommand = new DelegateCommand(OpenBlastx, CanOpenBlastx);
             OpenAlginBlastxCommand = new DelegateCommand(OpenAlignBlastx, CanOpenBlastx);
 
+            BrowseTblastnDbCommand = new DelegateCommand(BrowseTblastnDb);
+            OpenTblastnCommand = new DelegateCommand(OpenTblastn, CanOpenTblastn);
+            OpenAlginTblastnCommand = new DelegateCommand(OpenAlignTblastn, CanOpenTblastn);
+
             CloseCommand = new DelegateCommand(null, _ => false);
 		}
 
@@ -50,6 +57,10 @@ namespace LocalBlast
         public DelegateCommand BrowseBlastxDbCommand { get; }
         public DelegateCommand OpenBlastxCommand { get; }
         public DelegateCommand OpenAlginBlastxCommand { get; }
+
+        public DelegateCommand BrowseTblastnDbCommand { get; }
+        public DelegateCommand OpenTblastnCommand { get; }
+        public DelegateCommand OpenAlginTblastnCommand { get; }
 
         public override DelegateCommand CloseCommand { get; }
 
@@ -79,6 +90,16 @@ namespace LocalBlast
             set
             {
                 Settings.Default.BlastxDbPath = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string TblastnDbPath
+        {
+            get => Settings.Default.TblastnDbPath;
+            set
+            {
+                Settings.Default.TblastnDbPath = value;
                 OnPropertyChanged();
             }
         }
@@ -134,10 +155,7 @@ namespace LocalBlast
 
         public void BrowseBlastnDb(object? parameter)
         {
-            var dlg = new OpenFileDialog
-            {
-                Filter = BlastnPage.DbFileTypeFilter
-            };
+            var dlg = new OpenFileDialog { Filter = NuclDbFilter };
 
             if (File.Exists(BlastnDbPath))
                 dlg.InitialDirectory = Path.GetDirectoryName(BlastnDbPath);
@@ -179,10 +197,7 @@ namespace LocalBlast
 
         public void BrowseBlastpDb(object? parameter)
 		{
-            var dlg = new OpenFileDialog
-            {
-                Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal"
-            };
+            var dlg = new OpenFileDialog { Filter = ProtDbFilter };
 
             if (File.Exists(BlastpDbPath))
                 dlg.InitialDirectory = Path.GetDirectoryName(BlastpDbPath);
@@ -224,10 +239,7 @@ namespace LocalBlast
 
         public void BrowseBlastxDb(object? parameter)
         {
-            var dlg = new OpenFileDialog
-            {
-                Filter = "Protein sequence file (*.psq;*.pal)|*.psq;*.pal"
-            };
+            var dlg = new OpenFileDialog { Filter = ProtDbFilter };
 
             if (File.Exists(BlastxDbPath))
                 dlg.InitialDirectory = Path.GetDirectoryName(BlastxDbPath);
@@ -266,6 +278,48 @@ namespace LocalBlast
         }
 
         public bool CanOpenBlastx(object? parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "blastx.exe")) && File.Exists(BlastxDbPath);
+
+        public void BrowseTblastnDb(object? parameter)
+        {
+            var dlg = new OpenFileDialog { Filter = NuclDbFilter };
+
+            if (File.Exists(TblastnDbPath))
+                dlg.InitialDirectory = Path.GetDirectoryName(TblastnDbPath);
+
+            if (dlg.ShowDialog() == true)
+            {
+                TblastnDbPath = dlg.FileName;
+                OpenTblastnCommand.OnCanExecuteChanged();
+                OpenAlginTblastnCommand.OnCanExecuteChanged();
+            }
+        }
+
+        public void OpenTblastn(object? parameter)
+        {
+            var page = new TblastnPage(Owner)
+            {
+                ExePath = Path.Combine(Owner.BlastBinDir, "tblastn.exe"),
+                DbPath = TblastnDbPath[0..^4]
+            };
+
+            Owner.Tabs.Add(page);
+            Owner.SelectedTabIndex = Owner.Tabs.Count - 1;
+        }
+
+        public void OpenAlignTblastn(object? parameter)
+        {
+            var owner = Owner;
+            string exePath = Path.Combine(Owner.BlastBinDir, "tblastn.exe");
+            string dbPath = TblastnDbPath[0..^4];
+
+            OpenWithAlignment(() => new TblastnPage(owner)
+            {
+                ExePath = exePath,
+                DbPath = dbPath
+            });
+        }
+
+        public bool CanOpenTblastn(object? parameter) => File.Exists(Path.Combine(Owner.BlastBinDir, "tblastn.exe")) && File.Exists(TblastnDbPath);
 
         private void OpenWithAlignment(Func<BlastPage> pageInitializer)
         {

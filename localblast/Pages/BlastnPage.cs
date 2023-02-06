@@ -23,7 +23,8 @@ namespace LocalBlast
         {
             JobTitle = "blastn #" + index++;
 
-            Enum.TryParse(Settings.Default.BlastnTask, out task);
+            if (!Enum.TryParse(Settings.Default.BlastnTask, out task))
+                task = BlastnTask.Megablast;
         }
 
         public string QueryPaneHeight

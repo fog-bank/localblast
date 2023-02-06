@@ -221,6 +221,17 @@
                                 <Button Command="{Binding OpenBlastxCommand}">Create job</Button>
                                 <Button Margin="8,0" Command="{Binding OpenAlginBlastxCommand}">From fasta file</Button>
                             </StackPanel>
+                            <Separator Margin="0,10" BorderBrush="Gray" BorderThickness="1" />
+                            <TextBlock Style="{DynamicResource header}">tblastn (protein to translated nucleotides)</TextBlock>
+                            <StackPanel Margin="0,4" Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center">Database path:</TextBlock>
+                                <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding TblastnDbPath}" />
+                                <Button Command="{Binding BrowseTblastnDbCommand}">Browse</Button>
+                            </StackPanel>
+                            <StackPanel Margin="0,4" Orientation="Horizontal">
+                                <Button Command="{Binding OpenTblastnCommand}">Create job</Button>
+                                <Button Margin="8,0" Command="{Binding OpenAlginTblastnCommand}">From fasta file</Button>
+                            </StackPanel>
                         </StackPanel>
                     </ScrollViewer>
                 </DataTemplate>
@@ -927,6 +938,215 @@
                             <Setter TargetName="blastxResult" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="blastxGraphicSummary" Property="Visibility" Value="Collapsed" />
                             <Setter TargetName="blastxDescription" Property="Visibility" Value="Collapsed" />
+                        </DataTrigger>
+                    </DataTemplate.Triggers>
+                </DataTemplate>
+                <DataTemplate x:Key="TblastnPageContent" DataType="local:TblastnPage">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="{Binding QueryPaneHeight, Mode=TwoWay}" MinHeight="50" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="{Binding ResultPaneHeight, Mode=TwoWay}" MinHeight="50" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="{Binding DescPaneHeight, Mode=TwoWay}" MinHeight="50" />
+                        </Grid.RowDefinitions>
+                        <StackPanel Margin="4,4,4,8" Orientation="Horizontal">
+                            <Button Command="{Binding LoadSequenceCommand}">Load a sequence and Run</Button>
+                            <Button Margin="8,0" Command="{Binding RunCommand}">Run</Button>
+                            <Button Command="{Binding CancelCommand}">Cancel</Button>
+                        </StackPanel>
+                        <ScrollViewer Grid.Row="1">
+                            <StackPanel Margin="4">
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock VerticalAlignment="Center">Job title</TextBlock>
+                                    <TextBox Grid.Column="1" Margin="8,0" Padding="2" Text="{Binding JobTitle, UpdateSourceTrigger=PropertyChanged}" />
+                                </Grid>
+                                <StackPanel Margin="0,4" Orientation="Horizontal">
+                                    <TextBlock>Database:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding DbPath}" />
+                                </StackPanel>
+                                <!--<Expander Header="Parameters" Margin="0,4" />-->
+                                <Expander Header="Query sequence">
+                                    <TextBox Margin="0,4" Padding="2" FontFamily="Courier New" MinLines="4" AcceptsReturn="True" TextWrapping="Wrap"
+                                             Text="{Binding Query, UpdateSourceTrigger=PropertyChanged}" />
+                                </Expander>
+                                <StackPanel Margin="0,4" Orientation="Horizontal">
+                                    <TextBlock>Job ID:</TextBlock>
+                                    <TextBox Margin="4,0" BorderThickness="0" Text="{Binding JobID}" IsReadOnly="True" />
+                                </StackPanel>
+                                <CheckBox Margin="0,4" HorizontalAlignment="Left" IsChecked="{Binding EnableCleanup}">Delete temporary files after completed</CheckBox>
+                            </StackPanel>
+                        </ScrollViewer>
+                        <GridSplitter Grid.Row="2" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                        <Grid Grid.Row="3" Margin="4">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <TextBlock Style="{DynamicResource header}" Margin="0,4">Result</TextBlock>
+                            <StackPanel Name="blastpResult" Grid.Row="1" Margin="0,4" Orientation="Horizontal">
+                                <TextBlock VerticalAlignment="Center">Query length:</TextBlock>
+                                <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding QueryLength}" />
+                                <Slider Width="100" VerticalAlignment="Center"
+                                        Minimum="0.01" Maximum="1" LargeChange="0.1" SmallChange="0.01" Value="{Binding ZoomLevel}" />
+                                <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding ZoomLevel, Mode=OneWay, StringFormat=p0}" />
+                            </StackPanel>
+                            <TextBlock Grid.Row="2" Margin="0,4" Text="{Binding Message}">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Message}" Value="{x:Null}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                            <ScrollViewer Grid.Row="3" Margin="-4,0" Padding="4" HorizontalScrollBarVisibility="Auto">
+                                <StackPanel Name="blastpGraphicSummary">
+                                    <Border BorderBrush="LightGray" BorderThickness="1" Padding="1" HorizontalAlignment="Left" VerticalAlignment="Top">
+                                        <ListBox Style="{StaticResource alignView}" ItemsSource="{Binding Hits}" SelectedItem="{Binding SelectedHit}">
+                                            <ListBox.LayoutTransform>
+                                                <ScaleTransform ScaleX="{Binding ZoomLevel}" />
+                                            </ListBox.LayoutTransform>
+                                        </ListBox>
+                                    </Border>
+                                    <StackPanel Margin="0,4" Orientation="Horizontal">
+                                        <TextBlock VerticalAlignment="Center">Number of hits:</TextBlock>
+                                        <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding TotalHits}" />
+                                        <Button VerticalAlignment="Center" Command="{Binding ViewMoreHitsCommand}">Show more hits</Button>
+                                        <Button Margin="8,0" VerticalAlignment="Center" Command="{Binding ViewAllHitsCommand}">Show all hits</Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </Grid>
+                        <GridSplitter Grid.Row="4" Height="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                        <ScrollViewer Grid.Row="5" HorizontalScrollBarVisibility="Auto">
+                            <StackPanel Name="blastpDescription" Margin="4">
+                                <StackPanel Margin="0,4,0,8" Orientation="Horizontal">
+                                    <TextBlock Style="{DynamicResource header}" VerticalAlignment="Center">Description</TextBlock>
+                                    <ToolBar Margin="4">
+                                        <ToolBar.Template>
+                                            <ControlTemplate TargetType="ToolBar">
+                                                <StackPanel IsItemsHost="True" Orientation="Horizontal" />
+                                            </ControlTemplate>
+                                        </ToolBar.Template>
+                                        <Button Command="{Binding PreviousHitCommand}">
+                                            <Image Style="{DynamicResource btnImage}" Source="Resources/top.png" Height="16" />
+                                        </Button>
+                                        <Button Command="{Binding NextHitCommand}">
+                                            <Image Style="{DynamicResource btnImage}" Source="Resources/bottom.png" Height="16" />
+                                        </Button>
+                                    </ToolBar>
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Hit rank:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/Index}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Title:</TextBlock>
+                                    <TextBox Margin="8,0" BorderThickness="0" VerticalAlignment="Center" IsReadOnly="True" Text="{Binding Hits/Title, Mode=OneWay}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Subject length:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/Length}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Numer of matches:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/Segments.Count}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Max bit score:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/MaxBitScore}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Min E-value:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/MinEValue, StringFormat=g}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Query coverage:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/QueryCover, StringFormat=p0}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Subject coverage:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding Hits/HitCover, StringFormat=p0}" />
+                                </StackPanel>
+                                <Separator Height="1" Margin="0,6,0,2" />
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Style="{DynamicResource header}" Margin="0,8,4,8" VerticalAlignment="Center">
+										Segment detail #<Run Text="{Binding SelectedSegment.Index, Mode=OneWay}"/>
+                                    </TextBlock>
+                                    <ToolBar Margin="4">
+                                        <ToolBar.Template>
+                                            <ControlTemplate TargetType="ToolBar">
+                                                <StackPanel IsItemsHost="True" Orientation="Horizontal" />
+                                            </ControlTemplate>
+                                        </ToolBar.Template>
+                                        <Button Command="{Binding PreviousSegmentPairCommand}">
+                                            <Image Style="{DynamicResource btnImage}" Source="Resources/previous.png" Height="16" />
+                                        </Button>
+                                        <Button Command="{Binding NextSegmentPairCommand}">
+                                            <Image Style="{DynamicResource btnImage}" Source="Resources/next.png" Height="16" />
+                                        </Button>
+                                    </ToolBar>
+                                    <Button Margin="4" Command="{Binding CopyAlignmentCommand}">Copy alignment</Button>
+                                    <CheckBox Margin="4" VerticalAlignment="Center" IsChecked="{Binding SelectedSegment.IsVisible, Mode=OneWay}"
+                                              IsEnabled="False">Visible</CheckBox>
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Bit score:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.BitScore}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>E-value:</TextBlock>
+                                    <TextBlock Margin="8,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.EValue, StringFormat=g}" />
+                                </StackPanel>
+                                <StackPanel Margin="0,2" Orientation="Horizontal">
+                                    <TextBlock>Percent identity:</TextBlock>
+                                    <TextBlock Margin="4,0,8,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.IdentityRatio, StringFormat=p0}" />
+                                    <TextBlock>(Length:</TextBlock>
+                                    <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.AlignLength}" />
+                                    <TextBlock>, Identities:</TextBlock>
+                                    <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.Identity}" />
+                                    <TextBlock>, Positives:</TextBlock>
+                                    <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.Positive}" />
+                                    <TextBlock>, Gaps:</TextBlock>
+                                    <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.Gaps}" />
+                                    <TextBlock>)</TextBlock>
+                                </StackPanel>
+                                <StackPanel Margin="0,2,0,6" Orientation="Horizontal">
+                                    <TextBlock>Alignment  (Query:</TextBlock>
+                                    <TextBlock Margin="4,0,2,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.QueryFrom}" />
+                                    <TextBlock>..</TextBlock>
+                                    <TextBlock Margin="2,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.QueryTo}" />
+                                    <TextBlock>, Subject:</TextBlock>
+                                    <TextBlock Margin="4,0,2,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.HitFrom}" />
+                                    <TextBlock>..</TextBlock>
+                                    <TextBlock Margin="2,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.HitTo}" />
+                                    <TextBlock>, Frame:</TextBlock>
+                                    <TextBlock Margin="4,0,0,0" VerticalAlignment="Center" Text="{Binding SelectedSegment.HitFrame}" />
+                                    <TextBlock>):</TextBlock>
+                                </StackPanel>
+                                <TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.QueryScaleMark, Mode=OneWay}" />
+                                <TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.QuerySeq, Mode=OneWay}" />
+                                <TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.Alignment, Mode=OneWay}" />
+                                <TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.HitSeq, Mode=OneWay}" />
+                                <TextBlock FontFamily="Courier New" Text="{Binding SelectedSegment.HitScaleMark, Mode=OneWay}" />
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Grid>
+                    <DataTemplate.Triggers>
+                        <DataTrigger Binding="{Binding SelectedHit}" Value="{x:Null}">
+                            <Setter TargetName="blastpResult" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="blastpGraphicSummary" Property="Visibility" Value="Collapsed" />
+                            <Setter TargetName="blastpDescription" Property="Visibility" Value="Collapsed" />
                         </DataTrigger>
                     </DataTemplate.Triggers>
                 </DataTemplate>
