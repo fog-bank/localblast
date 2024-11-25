@@ -2,79 +2,73 @@
 using System.Collections.Generic;
 using System.Globalization;
 
-namespace LocalBlast
+namespace LocalBlast;
+
+public class BlastxPage : BlastPage
 {
-    public class BlastxPage : BlastPage
+    private static int index = 1;
+    private int maxTargetSeqs = Settings.Default.BlastxMaxTargetSeqs;
+
+    public BlastxPage(MainViewModel owner) : base(owner) => JobTitle = "blastx #" + index++;
+
+    public string QueryPaneHeight
     {
-        private static int index = 1;
-        private int maxTargetSeqs = Settings.Default.BlastxMaxTargetSeqs;
-
-        public BlastxPage(MainViewModel owner)
-            : base(owner)
+        get => Settings.Default.BlastxQueryPaneHeight;
+        set
         {
-            JobTitle = "blastx #" + index++;
+            Settings.Default.BlastxQueryPaneHeight = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string QueryPaneHeight
+    public string ResultPaneHeight
+    {
+        get => Settings.Default.BlastxResultPaneHeight;
+        set
         {
-            get => Settings.Default.BlastxQueryPaneHeight;
-            set
-            {
-                Settings.Default.BlastxQueryPaneHeight = value;
-                OnPropertyChanged();
-            }
+            Settings.Default.BlastxResultPaneHeight = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string ResultPaneHeight
+    public string DescPaneHeight
+    {
+        get => Settings.Default.BlastxDescPaneHeight;
+        set
         {
-            get => Settings.Default.BlastxResultPaneHeight;
-            set
-            {
-                Settings.Default.BlastxResultPaneHeight = value;
-                OnPropertyChanged();
-            }
+            Settings.Default.BlastxDescPaneHeight = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string DescPaneHeight
+    /// <summary>
+    /// Gets or sets the maximum number of aligned sequences to keep.
+    /// </summary>
+    public int MaxTargetSequences
+    {
+        get => maxTargetSeqs;
+        set
         {
-            get => Settings.Default.BlastxDescPaneHeight;
-            set
-            {
-                Settings.Default.BlastxDescPaneHeight = value;
-                OnPropertyChanged();
-            }
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+
+            maxTargetSeqs = value;
+            OnPropertyChanged();
         }
+    }
 
-        /// <summary>
-        /// Gets or sets the maximum number of aligned sequences to keep.
-        /// </summary>
-        public int MaxTargetSequences
-        {
-            get => maxTargetSeqs;
-            set
-            {
-                if (value <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(value));
+    public override void Close(object? parameter)
+    {
+        base.Close(parameter);
 
-                maxTargetSeqs = value;
-                OnPropertyChanged();
-            }
-        }
+        Settings.Default.BlastxMaxTargetSeqs = MaxTargetSequences;
+    }
 
-        public override void Close(object? parameter)
-        {
-            base.Close(parameter);
+    protected override void SetArgument(Dictionary<string, string> arglist)
+    {
+        base.SetArgument(arglist);
 
-            Settings.Default.BlastxMaxTargetSeqs = MaxTargetSequences;
-        }
+        var culture = CultureInfo.InvariantCulture;
 
-        protected override void SetArgument(Dictionary<string, string> arglist)
-        {
-            base.SetArgument(arglist);
-
-            var culture = CultureInfo.InvariantCulture;
-
-            arglist["max_target_seqs"] = MaxTargetSequences.ToString(culture);
-        }
+        arglist["max_target_seqs"] = MaxTargetSequences.ToString(culture);
     }
 }

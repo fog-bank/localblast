@@ -1,43 +1,38 @@
-﻿namespace LocalBlast
+﻿namespace LocalBlast;
+
+public class BlastpPage : BlastPage
 {
-    public class BlastpPage : BlastPage
+    private static int index = 1;
+
+    public BlastpPage(MainViewModel owner) : base(owner) => JobTitle = "blastp #" + index++;
+
+    public string QueryPaneHeight
     {
-        private static int index = 1;
-
-        public BlastpPage(MainViewModel owner)
-            : base(owner)
+        get => Settings.Default.BlastpQueryPaneHeight;
+        set
         {
-            JobTitle = "blastp #" + index++;
+            Settings.Default.BlastpQueryPaneHeight = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string QueryPaneHeight
+    public string ResultPaneHeight
+    {
+        get => Settings.Default.BlastpResultPaneHeight;
+        set
         {
-            get => Settings.Default.BlastpQueryPaneHeight;
-            set
-            {
-                Settings.Default.BlastpQueryPaneHeight = value;
-                OnPropertyChanged();
-            }
+            Settings.Default.BlastpResultPaneHeight = value;
+            OnPropertyChanged();
         }
+    }
 
-        public string ResultPaneHeight
+    public string DescPaneHeight
+    {
+        get => Settings.Default.BlastpDescPaneHeight;
+        set
         {
-            get => Settings.Default.BlastpResultPaneHeight;
-            set
-            {
-                Settings.Default.BlastpResultPaneHeight = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public string DescPaneHeight
-        {
-            get => Settings.Default.BlastpDescPaneHeight;
-            set
-            {
-                Settings.Default.BlastpDescPaneHeight = value;
-                OnPropertyChanged();
-            }
+            Settings.Default.BlastpDescPaneHeight = value;
+            OnPropertyChanged();
         }
     }
 }

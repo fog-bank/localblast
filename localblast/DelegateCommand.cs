@@ -1,45 +1,21 @@
 ﻿using System;
 using System.Windows.Input;
 
-namespace LocalBlast
+namespace LocalBlast;
+
+public class DelegateCommand(Action<object?>? execute, Func<object?, bool>? canExecute = null) : ICommand
 {
-	public class DelegateCommand : ICommand
-	{
-		private readonly Action<object?>? execute;
-		private readonly Func<object?, bool>? canExecute;
+    public void Execute(object? parameter = null) => execute?.Invoke(parameter);
 
-		public DelegateCommand(Action<object?>? execute)
-			: this(execute, null)
-		{
-		}
+    public bool CanExecute(object? parameter = null) => canExecute == null || canExecute(parameter);
 
-		public DelegateCommand(Action<object?>? execute, Func<object?, bool>? canExecute)
-		{
-			this.execute = execute;
-			this.canExecute = canExecute;
-		}
+    public void TryExecute(object? exeParameter = null, object? canParameter = null)
+    {
+        if (CanExecute(canParameter))
+            Execute(exeParameter);
+    }
 
-		public void Execute(object? parameter = null)
-		{
-			execute?.Invoke(parameter);
-		}
+    public void OnCanExecuteChanged() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 
-		public bool CanExecute(object? parameter = null)
-		{
-			return canExecute == null || canExecute(parameter);
-		}
-
-        public void TryExecute(object? exeParameter = null, object? canParameter = null)
-        {
-            if (CanExecute(canParameter))
-                Execute(exeParameter);
-        }
-
-		public void OnCanExecuteChanged()
-		{
-			CanExecuteChanged?.Invoke(this, EventArgs.Empty);
-		}
-
-		public event EventHandler? CanExecuteChanged;
-	}
+    public event EventHandler? CanExecuteChanged;
 }

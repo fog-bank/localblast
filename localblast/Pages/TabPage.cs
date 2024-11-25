@@ -1,60 +1,54 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace LocalBlast
+namespace LocalBlast;
+
+public abstract class TabPage(MainViewModel owner) : INotifyPropertyChanged
 {
-    public abstract class TabPage : INotifyPropertyChanged
+    private string? header;
+    private PageState state;
+
+    public MainViewModel Owner { get; } = owner;
+
+    public string? Header
     {
-        private string? header;
-        private PageState state;
-
-        public TabPage(MainViewModel owner)
+        get => header;
+        set
         {
-            Owner = owner;
+            header = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(HeaderTooltip));
         }
-
-        public MainViewModel Owner { get; }
-
-        public string? Header
-        {
-            get => header;
-            set
-            {
-                header = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(HeaderTooltip));
-            }
-        }
-
-        public virtual string? HeaderTooltip => Header;
-
-        public PageState State
-        {
-            get => state;
-            set
-            {
-                state = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public abstract DelegateCommand CloseCommand { get; }
-
-        protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            //Debug.WriteLine(GetType().Name + "." + propertyName);
-        }
-
-        public event PropertyChangedEventHandler? PropertyChanged;
     }
 
-    public enum PageState
+    public virtual string? HeaderTooltip => Header;
+
+    public PageState State
     {
-        None,
-        New,
-        Running,
-        Completed,
-        Error
+        get => state;
+        set
+        {
+            state = value;
+            OnPropertyChanged();
+        }
     }
+
+    public abstract DelegateCommand CloseCommand { get; }
+
+    protected void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        //Debug.WriteLine(GetType().Name + "." + propertyName);
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+}
+
+public enum PageState
+{
+    None,
+    New,
+    Running,
+    Completed,
+    Error
 }
